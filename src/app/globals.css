@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  --drop-bg: #04050d;
+  --drop-bg-soft: #0c1020;
+  --drop-accent: #4ce2ff;
+  --drop-accent-2: #9cf7ff;
+  --drop-danger: #fb7185;
+}
+
+@theme inline {
+  --color-background: var(--drop-bg);
+  --color-foreground: #f4f4f5;
+  --font-sans: var(--font-space);
+  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-space);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(34, 211, 238, 0.08), transparent 45%),
+    radial-gradient(circle at 80% 85%, rgba(244, 114, 182, 0.06), transparent 45%),
+    var(--drop-bg);
+  color: #f4f4f5;
+  font-family: var(--font-space), sans-serif;
+}
+
+.noise-overlay {
+  opacity: 0.22;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 4px 4px, 4px 4px;
+  mix-blend-mode: soft-light;
+}
+
+@keyframes pulse-border {
+  0% {
+    border-color: rgba(34, 211, 238, 0.2);
+  }
+  50% {
+    border-color: rgba(34, 211, 238, 0.5);
+  }
+  100% {
+    border-color: rgba(34, 211, 238, 0.2);
+  }
+}
+
+.pulse-border {
+  animation: pulse-border 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

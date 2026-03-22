@@ -1,0 +1,17 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#27272a"/>
+      <stop offset="50%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#27272a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg2)"/>
+  <rect x="210" y="170" width="780" height="560" rx="20" fill="#18181b" stroke="#f97316" stroke-width="10"/>
+  <rect x="280" y="250" width="640" height="400" fill="#0c4a6e"/>
+  <rect x="310" y="280" width="580" height="340" fill="#22d3ee" opacity="0.2"/>
+  <circle cx="450" cy="450" r="72" fill="#facc15"/>
+  <circle cx="740" cy="450" r="72" fill="#facc15"/>
+  <path d="M420 560 L780 560 L600 620 Z" fill="#f97316"/>
+  <text x="600" y="115" text-anchor="middle" fill="#fed7aa" font-family="monospace" font-size="30">legacy mascot requires immediate respect</text>
+</svg>

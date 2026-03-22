@@ -1,0 +1,10 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" fill="#020617"/>
+  <rect x="160" y="160" width="640" height="420" rx="22" fill="#111827" stroke="#22d3ee" stroke-width="4"/>
+  <rect x="260" y="240" width="640" height="420" rx="22" fill="#0f172a" stroke="#fb7185" stroke-width="4"/>
+  <rect x="360" y="320" width="640" height="420" rx="22" fill="#020617" stroke="#facc15" stroke-width="4"/>
+  <circle cx="430" cy="380" r="12" fill="#22d3ee"/>
+  <circle cx="530" cy="380" r="12" fill="#fb7185"/>
+  <circle cx="630" cy="380" r="12" fill="#facc15"/>
+  <text x="600" y="150" text-anchor="middle" fill="#cbd5e1" font-family="monospace" font-size="34">too many tabs. still opening one more.</text>
+</svg>
