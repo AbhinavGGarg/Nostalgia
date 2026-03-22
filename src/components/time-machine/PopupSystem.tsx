@@ -40,6 +40,25 @@ export function PopupSystem({ profile, enabled }: PopupSystemProps) {
     }
 
     let serial = 0;
+    let nextSpawnTimer: number | null = null;
+    const activeRemovalTimers = new Map<number, number>();
+
+    const dismissPopup = (id: number) => {
+      setPopups((current) => current.filter((entry) => entry.id !== id));
+      const timer = activeRemovalTimers.get(id);
+      if (timer !== undefined) {
+        window.clearTimeout(timer);
+        activeRemovalTimers.delete(id);
+      }
+    };
+
+    const scheduleNext = () => {
+      const delay = 15000 + Math.floor(Math.random() * 2001);
+      nextSpawnTimer = window.setTimeout(() => {
+        spawn();
+        scheduleNext();
+      }, delay);
+    };
 
     const spawn = () => {
       const text = messages[Math.floor(Math.random() * messages.length)];
@@ -51,24 +70,26 @@ export function PopupSystem({ profile, enabled }: PopupSystemProps) {
       };
       serial += 1;
 
-      setPopups((current) => [popup, ...current].slice(0, 4));
+      setPopups((current) => [popup, ...current].slice(0, 3));
       window.dispatchEvent(new Event("tm2016-notify"));
 
-      window.setTimeout(() => {
-        setPopups((current) => current.filter((entry) => entry.id !== popup.id));
-      }, 3200 + Math.random() * 2400);
+      const removalTimer = window.setTimeout(() => {
+        dismissPopup(popup.id);
+      }, 8200 + Math.random() * 2000);
+      activeRemovalTimers.set(popup.id, removalTimer);
     };
 
-    const first = window.setTimeout(spawn, 2200);
-
-    const interval = window.setInterval(
-      spawn,
-      4500 + Math.floor(Math.random() * 4800),
-    );
+    const first = window.setTimeout(() => {
+      spawn();
+      scheduleNext();
+    }, 7600);
 
     return () => {
       window.clearTimeout(first);
-      window.clearInterval(interval);
+      if (nextSpawnTimer !== null) {
+        window.clearTimeout(nextSpawnTimer);
+      }
+      activeRemovalTimers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [enabled, messages]);
 
@@ -80,6 +101,14 @@ export function PopupSystem({ profile, enabled }: PopupSystemProps) {
     <div className="pointer-events-none fixed right-3 top-3 z-40 flex w-[min(92vw,330px)] flex-col gap-2 sm:right-6 sm:top-6">
       {popups.map((popup) => (
         <aside key={popup.id} className="popup-card pointer-events-auto">
+          <button
+            type="button"
+            className="popup-close"
+            onClick={() => setPopups((current) => current.filter((entry) => entry.id !== popup.id))}
+            aria-label="Close popup"
+          >
+            x
+          </button>
           <p className="font-pixel text-[10px] uppercase text-cyan-100">{popup.source} alert</p>
           <p className="mt-1 text-sm text-white">{popup.text}</p>
         </aside>

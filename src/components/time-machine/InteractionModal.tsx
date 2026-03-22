@@ -10,6 +10,10 @@ export type InteractionModalItem = {
   body: string;
   imageUrl?: string;
   source: "post" | "search";
+  threadTitle?: string;
+  threadItems?: string[];
+  replyPlaceholder?: string;
+  postedLabel?: string;
 };
 
 type InteractionModalProps = {
@@ -74,7 +78,7 @@ export function InteractionModal({ item, onClose }: InteractionModalProps) {
             <p className="text-xs text-pink-100">{item.subtitle}</p>
           </div>
           <button type="button" className="retro-micro-btn" onClick={onClose}>
-            Close
+            X
           </button>
         </div>
 
@@ -92,6 +96,19 @@ export function InteractionModal({ item, onClose }: InteractionModalProps) {
         ) : null}
 
         <p className="interaction-body">{item.body}</p>
+
+        {item.threadItems && item.threadItems.length > 0 ? (
+          <section className="interaction-thread">
+            <p className="font-pixel text-[10px] text-cyan-100">{item.threadTitle ?? "THREAD"}</p>
+            <div className="interaction-thread-list">
+              {item.threadItems.map((entry, index) => (
+                <p key={`${item.id}-thread-${index}`} className="interaction-thread-item">
+                  {entry}
+                </p>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <div className="interaction-actions">
           <button type="button" className="retro-micro-btn" onClick={toggleLike}>
@@ -113,14 +130,14 @@ export function InteractionModal({ item, onClose }: InteractionModalProps) {
               window.dispatchEvent(new Event("tm2016-type"));
             }}
             className="retro-input"
-            placeholder="drop a comment like it's 2016..."
+            placeholder={item.replyPlaceholder ?? "drop a comment like it's 2016..."}
           />
           <button type="button" className="retro-micro-btn" onClick={postReply}>
             Post Reply
           </button>
         </div>
 
-        {posted ? <p className="text-xs text-cyan-100">reply posted to the timeline</p> : null}
+        {posted ? <p className="text-xs text-cyan-100">{item.postedLabel ?? "reply posted to the timeline"}</p> : null}
       </div>
     </div>
   );

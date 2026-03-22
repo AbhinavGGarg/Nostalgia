@@ -304,8 +304,59 @@ function replies(seedRef: { current: number }) {
   return `${7 + Math.floor(nextValue(seedRef) * 88)} replies`;
 }
 
-function seedImage(seed: string) {
-  return `https://picsum.photos/seed/${encodeURIComponent(seed)}/480/290`;
+function hashCode(input: string) {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (Math.imul(hash, 31) + input.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function escapeXml(text: string) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function shorten(text: string, words: number) {
+  return text
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, words)
+    .join(" ");
+}
+
+function seedImage(seed: string, focus: string, label: string) {
+  const palettes = [
+    ["#63ecff", "#b46fff", "#240b58"],
+    ["#ff86bf", "#6ec4ff", "#30115f"],
+    ["#ffbb6f", "#ff6fa3", "#341255"],
+    ["#8efeb8", "#6f8dff", "#21134a"],
+  ] as const;
+  const palette = palettes[hashCode(seed) % palettes.length];
+  const angle = 12 + (hashCode(seed + "-a") % 24);
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='480' height='290' viewBox='0 0 480 290'>
+    <defs>
+      <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='${palette[0]}'/>
+        <stop offset='52%' stop-color='${palette[1]}'/>
+        <stop offset='100%' stop-color='${palette[2]}'/>
+      </linearGradient>
+    </defs>
+    <rect width='480' height='290' fill='url(#g)'/>
+    <rect width='480' height='290' fill='rgba(0,0,0,0.2)'/>
+    <g transform='translate(34 38) rotate(${angle / 10})'>
+      <rect x='0' y='0' width='412' height='210' rx='16' fill='rgba(6,4,28,0.34)' stroke='rgba(255,255,255,0.28)'/>
+      <text x='20' y='56' fill='white' font-family='Verdana, Arial, sans-serif' font-size='28' font-weight='700'>${escapeXml(shorten(focus.toUpperCase(), 5))}</text>
+      <text x='20' y='104' fill='#d6f8ff' font-family='Verdana, Arial, sans-serif' font-size='20'>${escapeXml(shorten(label, 8))}</text>
+      <text x='20' y='146' fill='#ffd9ee' font-family='Verdana, Arial, sans-serif' font-size='15'>captured from old-web archives</text>
+    </g>
+  </svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
 function prioritizedKinds(topic: Topic) {
@@ -362,7 +413,7 @@ export function generateNostalgiaSearchResults(profile: UserProfile, query: stri
         title: formatTemplate(pick(pack.videos, seedRef), focus),
         channel: pick(CHANNELS, seedRef),
         views: views(seedRef),
-        imageUrl: seedImage(`${focus}-video-${index}`),
+        imageUrl: seedImage(`${focus}-video-${index}`, focus, "video result"),
         tilt,
         offsetY,
       };
@@ -401,7 +452,7 @@ export function generateNostalgiaSearchResults(profile: UserProfile, query: stri
         kind,
         topText: formatTemplate(pick(pack.memeTop, seedRef), focus),
         caption: formatTemplate(pick(pack.memeCaption, seedRef), focus),
-        imageUrl: seedImage(`${focus}-meme-${index}`),
+        imageUrl: seedImage(`${focus}-meme-${index}`, focus, "meme result"),
         tilt,
         offsetY,
       };

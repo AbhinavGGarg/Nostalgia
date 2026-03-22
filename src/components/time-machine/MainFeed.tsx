@@ -12,6 +12,16 @@ type MainFeedProps = {
 
 type LagMap = Record<string, boolean>;
 
+function retweetThread(item: FeedItem) {
+  const short = item.caption.slice(0, 70);
+  return [
+    `@analogmood: this is so real -> ${short}`,
+    "@latebusvibes: 2016 timeline energy was undefeated",
+    "@wifi_crying: same. battery 3% and still refreshing",
+    "@tinytextposts: somebody pin this before it disappears",
+  ];
+}
+
 function platformLabel(item: FeedItem) {
   if (item.platform === "instagram") {
     return "Instagram";
@@ -141,7 +151,29 @@ export function MainFeed({ profile }: MainFeedProps) {
               </button>
               <span>{item.likes ? `${item.likes + (liked[item.id] ? 1 : 0)} likes` : ""}</span>
               <span>{item.notes ? `${item.notes} notes` : ""}</span>
-              <span>{item.reposts ? `${item.reposts} retweets` : ""}</span>
+              {item.reposts ? (
+                <button
+                  type="button"
+                  className="retro-micro-btn"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setActivePost({
+                      id: `${item.id}-retweets`,
+                      title: "Retweet Thread",
+                      subtitle: `${item.handle} • ${item.reposts} retweets`,
+                      body: item.caption,
+                      imageUrl: item.imageUrl,
+                      source: "post",
+                      threadTitle: "RETWEET REPLIES",
+                      threadItems: retweetThread(item),
+                      replyPlaceholder: "reply to this retweet thread...",
+                      postedLabel: "your retweet reply is now live",
+                    });
+                  }}
+                >
+                  {item.reposts} retweets
+                </button>
+              ) : null}
             </footer>
           </article>
         ))}

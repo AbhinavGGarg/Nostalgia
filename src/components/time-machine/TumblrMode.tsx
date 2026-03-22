@@ -33,6 +33,11 @@ const SEED_THOUGHTS: Thought[] = [
 ];
 
 const BACKDROPS: Backdrop[] = ["sunset", "galaxy", "neon"];
+const BACKDROP_DETAILS: Record<Backdrop, string> = {
+  sunset: "sunset = warm nostalgic diary vibe",
+  galaxy: "galaxy = late-night deep-thought vibe",
+  neon: "neon = chaotic internet-energy vibe",
+};
 
 export function TumblrMode() {
   const [background, setBackground] = useState<Backdrop>("sunset");
@@ -88,6 +93,7 @@ export function TumblrMode() {
           </button>
         ))}
       </div>
+      <p className="mt-2 text-xs text-cyan-100">{BACKDROP_DETAILS[background]}</p>
 
       <button type="button" disabled={!canPost} onClick={postThought} className="retro-micro-btn mt-3">
         Post Anonymously
