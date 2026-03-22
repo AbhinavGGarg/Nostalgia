@@ -1,22 +1,29 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { Bangers, Fredoka, VT323 } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space",
+const fredoka = Fredoka({
+  variable: "--font-bubble",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  weight: ["400", "500", "600"],
+const bangers = Bangers({
+  variable: "--font-chaos",
   subsets: ["latin"],
+  weight: "400",
+});
+
+const vt323 = VT323({
+  variable: "--font-pixel",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
-  title: "DROP — The Internet Used To Surprise You",
+  title: "Nostalgia — A Personalized Digital Time Machine",
   description:
-    "Spontaneity-first social experience. One random interaction. Live timer. No feed. No retries. No algorithm.",
+    "Immersive, chaotic, personalized recreation of 2016 internet culture with mixed feeds, mini-games, camera filters, and timeline collapse.",
 };
 
 export default function RootLayout({
@@ -25,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${plexMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[var(--drop-bg)] text-zinc-100">{children}</body>
+    <html lang="en" className={`${fredoka.variable} ${bangers.variable} ${vt323.variable} h-full antialiased`}>
+      <body className="min-h-full bg-[#120531] text-zinc-100">{children}</body>
     </html>
   );
 }

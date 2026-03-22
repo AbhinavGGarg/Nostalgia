@@ -1,5 +1,5 @@
-import { LandingExperience } from "@/components/landing-experience";
+import { TimeMachineExperience } from "@/components/time-machine/TimeMachineExperience";
 
 export default function HomePage() {
-  return <LandingExperience />;
+  return <TimeMachineExperience />;
 }
