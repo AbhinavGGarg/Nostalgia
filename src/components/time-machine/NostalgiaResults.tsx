@@ -137,7 +137,7 @@ export function NostalgiaResults({ query, results, searching, searchStarted, fli
                 key={result.id}
                 className="search2016-result-shell"
                 style={{
-                  transform: `translateY(${result.offsetY}px) rotate(${result.tilt}deg)`,
+                  transform: `translateY(${Math.round(result.offsetY * 0.55)}px) rotate(${(result.tilt * 0.55).toFixed(2)}deg)`,
                   marginLeft: `${(index % 3) * 2}px`,
                   marginRight: `${(index % 2) * 4}px`,
                 }}

@@ -66,7 +66,7 @@ export function MainFeed({ profile }: MainFeedProps) {
           <article
             key={item.id}
             className="retro-feed-card cursor-pointer"
-            style={{ transform: `rotate(${(index % 3 - 1) * 0.65}deg)` }}
+            style={{ transform: `rotate(${(index % 3 - 1) * 0.28}deg)` }}
             role="button"
             tabIndex={0}
             onClick={() =>
