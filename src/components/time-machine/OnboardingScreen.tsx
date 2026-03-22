@@ -42,13 +42,15 @@ const LOADING_STEPS = [
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const [ageIn2016Input, setAgeIn2016Input] = useState("");
-  const [favoriteApps, setFavoriteApps] = useState<FavoriteApp[]>(["Instagram", "Snapchat"]);
+  const [favoriteApps, setFavoriteApps] = useState<FavoriteApp[]>([]);
   const [favoriteContent, setFavoriteContent] = useState("memes, pop music, bottle flipping");
   const [vibe, setVibe] = useState<PersonalityVibe>("chaotic");
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const parsedAgeIn2016 = Number.parseInt(ageIn2016Input, 10);
   const hasValidAge = Number.isFinite(parsedAgeIn2016) && parsedAgeIn2016 >= 1 && parsedAgeIn2016 <= 120;
+  const hasSelectedApps = favoriteApps.length > 0;
 
   const loadingLabel = useMemo(
     () => LOADING_STEPS[Math.min(LOADING_STEPS.length - 1, Math.floor(progress / 22))],
@@ -84,18 +86,24 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const toggleApp = (app: FavoriteApp) => {
     setFavoriteApps((current) => {
       if (current.includes(app)) {
-        const next = current.filter((value) => value !== app);
-        return next.length > 0 ? next : current;
+        return current.filter((value) => value !== app);
       }
       return [...current, app];
     });
+    setSubmitError(null);
   };
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!hasValidAge) {
+      setSubmitError("Add your age first.");
       return;
     }
+    if (!hasSelectedApps) {
+      setSubmitError("Pick at least 1 favorite app to continue.");
+      return;
+    }
+    setSubmitError(null);
     setProgress(0);
     setIsLoading(true);
   };
@@ -129,7 +137,10 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
               value={ageIn2016Input}
               placeholder="Type your age (e.g. 7)"
               disabled={isLoading}
-              onChange={(event) => setAgeIn2016Input(event.target.value)}
+              onChange={(event) => {
+                setAgeIn2016Input(event.target.value);
+                setSubmitError(null);
+              }}
               className="retro-input"
             />
           </label>
@@ -184,6 +195,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
             <button type="submit" disabled={isLoading || !hasValidAge} className="retro-submit">
               {isLoading ? "Initializing Time Machine..." : "Start My 2016"}
             </button>
+            {submitError ? <p className="mt-2 text-sm text-pink-100">{submitError}</p> : null}
           </div>
 
           {isLoading ? (
