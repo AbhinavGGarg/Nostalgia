@@ -8,6 +8,11 @@ type TimeMachineInputProps = {
 };
 
 const APP_OPTIONS = ["Instagram", "Snapchat", "Vine", "YouTube", "Spotify"];
+const QUICK_STARTS = [
+  "music, memes, youtube commentary",
+  "school stress, gaming after homework",
+  "summer boredom, playlist screenshots, vine loops",
+];
 
 export function TimeMachineInput({ onSubmit }: TimeMachineInputProps) {
   const [interests, setInterests] = useState("");
@@ -54,11 +59,27 @@ export function TimeMachineInput({ onSubmit }: TimeMachineInputProps) {
         <p className="tmx-subtitle">
           Type what you remember and we will rebuild your messy 2016 internet timeline.
         </p>
+        <div className="tmx-chip-row tmx-quick-row" aria-label="Quick start memory examples">
+          {QUICK_STARTS.map((entry) => (
+            <button
+              key={entry}
+              type="button"
+              className="tmx-chip"
+              onClick={() => {
+                setInterests(entry);
+                setError(null);
+              }}
+            >
+              use: {entry}
+            </button>
+          ))}
+        </div>
 
         <form onSubmit={submit} className="tmx-form-grid">
-          <label className="tmx-field">
+          <label className="tmx-field" htmlFor="tmx-interests">
             <span>What were you into in 2016?</span>
             <textarea
+              id="tmx-interests"
               value={interests}
               onChange={(event) => {
                 setInterests(event.target.value);
@@ -70,9 +91,10 @@ export function TimeMachineInput({ onSubmit }: TimeMachineInputProps) {
             />
           </label>
 
-          <label className="tmx-field">
+          <label className="tmx-field" htmlFor="tmx-dayfeel">
             <span>What did your days feel like?</span>
             <textarea
+              id="tmx-dayfeel"
               value={dayFeel}
               onChange={(event) => {
                 setDayFeel(event.target.value);
@@ -104,7 +126,11 @@ export function TimeMachineInput({ onSubmit }: TimeMachineInputProps) {
             Go Back to 2016
           </button>
 
-          {error ? <p className="tmx-error">{error}</p> : null}
+          {error ? (
+            <p className="tmx-error" role="alert">
+              {error}
+            </p>
+          ) : null}
         </form>
       </section>
     </main>

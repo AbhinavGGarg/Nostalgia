@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import type { NostalgiaResult } from "./types";
 
 type ModalViewerProps = {
@@ -18,6 +19,21 @@ function variantFor(result: NostalgiaResult) {
 }
 
 export function ModalViewer({ result, onClose }: ModalViewerProps) {
+  useEffect(() => {
+    if (!result) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose, result]);
+
   if (!result) {
     return null;
   }
@@ -26,7 +42,13 @@ export function ModalViewer({ result, onClose }: ModalViewerProps) {
 
   return (
     <section className="tmx-modal-backdrop" onClick={onClose}>
-      <article className="tmx-modal-card" onClick={(event) => event.stopPropagation()}>
+      <article
+        className="tmx-modal-card"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${result.source} simulated page`}
+      >
         <header className="tmx-modal-header">
           <p className="tmx-pill">{`${variant.toUpperCase()} / SIMULATED`}</p>
           <button type="button" className="tmx-modal-close" onClick={onClose}>

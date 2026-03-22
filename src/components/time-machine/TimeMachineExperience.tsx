@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CameraMode } from "./CameraMode";
 import { MainFeed } from "./MainFeed";
 import { MiniGames } from "./MiniGames";
 import { MusicPlayer } from "./MusicPlayer";
+import { NostalgiaResults } from "./NostalgiaResults";
+import { generateNostalgiaSearchResults, nostalgiaSearchDelayMs, type NostalgiaSearchResult } from "./nostalgia-search-data";
+import { NostalgiaSearchBar } from "./NostalgiaSearchBar";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { PopupSystem } from "./PopupSystem";
 import { TimeCollapse } from "./TimeCollapse";
@@ -13,12 +16,48 @@ import { TumblrMode } from "./TumblrMode";
 import type { CollapseStage, UserProfile } from "./types";
 
 type AppStage = "onboarding" | "transition" | "experience";
+type ExperienceView = "feed" | "explore";
+
+const LOADING_MESSAGES = ["Searching 2016 internet...", "Connecting to old servers..."] as const;
 
 export function TimeMachineExperience() {
   const [stage, setStage] = useState<AppStage>("onboarding");
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [collapseStage, setCollapseStage] = useState<CollapseStage>(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [submittedQuery, setSubmittedQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<NostalgiaSearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchStarted, setSearchStarted] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>(LOADING_MESSAGES[0]);
+  const [activeView, setActiveView] = useState<ExperienceView>("feed");
+  const [searchFlicker, setSearchFlicker] = useState(false);
+
+  const searchTimerRef = useRef<number | null>(null);
+  const loadingSwapTimerRef = useRef<number | null>(null);
+  const flickerTimerRef = useRef<number | null>(null);
+
+  const clearSearchTimers = () => {
+    if (searchTimerRef.current !== null) {
+      window.clearTimeout(searchTimerRef.current);
+      searchTimerRef.current = null;
+    }
+    if (loadingSwapTimerRef.current !== null) {
+      window.clearTimeout(loadingSwapTimerRef.current);
+      loadingSwapTimerRef.current = null;
+    }
+    if (flickerTimerRef.current !== null) {
+      window.clearTimeout(flickerTimerRef.current);
+      flickerTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      clearSearchTimers();
+    };
+  }, []);
 
   const stageClass = useMemo(() => {
     if (collapseStage === 1) {
@@ -60,6 +99,47 @@ export function TimeMachineExperience() {
     );
   }
 
+  const runSearch = () => {
+    if (searching) {
+      return;
+    }
+
+    const typedQuery = searchQuery.trim();
+    const fallbackQuery = profile.favoriteContent.split(",")[0]?.trim() || "2016 internet";
+    const finalQuery = typedQuery || fallbackQuery;
+
+    if (!typedQuery) {
+      setSearchQuery(finalQuery);
+    }
+
+    clearSearchTimers();
+    setSearchStarted(true);
+    setSearching(true);
+    setSearchFlicker(true);
+    setSubmittedQuery(finalQuery);
+    setActiveView("explore");
+    setLoadingMessage(LOADING_MESSAGES[0]);
+
+    const delay = nostalgiaSearchDelayMs(finalQuery);
+    const swapAt = Math.min(850, Math.max(280, Math.floor(delay * 0.52)));
+
+    loadingSwapTimerRef.current = window.setTimeout(() => {
+      setLoadingMessage(LOADING_MESSAGES[1]);
+    }, swapAt);
+
+    flickerTimerRef.current = window.setTimeout(() => {
+      setSearchFlicker(false);
+    }, 520);
+
+    searchTimerRef.current = window.setTimeout(() => {
+      setSearchResults(generateNostalgiaSearchResults(profile, finalQuery));
+      setSearching(false);
+      setSearchFlicker(false);
+      setLoadingMessage(LOADING_MESSAGES[0]);
+      window.dispatchEvent(new Event("tm2016-notify"));
+    }, delay);
+  };
+
   return (
     <main className={`relative min-h-screen overflow-hidden px-3 pb-24 pt-4 sm:px-5 sm:pt-6 ${stageClass}`}>
       <div className="vhs-noise pointer-events-none absolute inset-0 opacity-45" />
@@ -69,7 +149,17 @@ export function TimeMachineExperience() {
 
       <PopupSystem profile={profile} enabled />
 
-      <header className="retro-panel relative z-10 mb-4 flex flex-wrap items-center justify-between gap-2 p-4">
+      <NostalgiaSearchBar
+        query={searchQuery}
+        searching={searching}
+        loadingMessage={loadingMessage}
+        activeView={activeView}
+        onChangeQuery={setSearchQuery}
+        onSearch={runSearch}
+        onSwitchView={setActiveView}
+      />
+
+      <header className={`retro-panel relative z-10 mb-4 flex flex-wrap items-center justify-between gap-2 p-4 ${searchFlicker ? "glitch-panel" : ""}`}>
         <div>
           <p className="font-pixel text-[10px] text-cyan-100">CONNECTING TO 2016 SERVERS...</p>
           <h1 className="font-chaos mt-1 text-3xl text-white sm:text-4xl">NOSTALGIA</h1>
@@ -83,7 +173,17 @@ export function TimeMachineExperience() {
       </header>
 
       <section className="relative z-10 grid gap-4 xl:grid-cols-[1.3fr_0.9fr]">
-        <MainFeed profile={profile} />
+        {activeView === "feed" ? (
+          <MainFeed profile={profile} />
+        ) : (
+          <NostalgiaResults
+            query={submittedQuery || searchQuery}
+            results={searchResults}
+            searching={searching}
+            searchStarted={searchStarted}
+            flicker={searchFlicker}
+          />
+        )}
 
         <div className="space-y-4 lg:ml-1">
           <MusicPlayer autoStart />

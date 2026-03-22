@@ -8,6 +8,7 @@ import { PopupSystem } from "./PopupSystem";
 import { ResultsFeed } from "./ResultsFeed";
 import { SoundController } from "./SoundController";
 import { TimeMachineInput } from "./TimeMachineInput";
+import { JudgeNotesPanel } from "./JudgeNotesPanel";
 import { TransitionOverlay } from "./TransitionOverlay";
 import type { MemoryInput, NostalgiaResult } from "./types";
 
@@ -21,6 +22,8 @@ export function TimeMachineSection() {
   const [results, setResults] = useState<NostalgiaResult[]>([]);
   const [selectedResult, setSelectedResult] = useState<NostalgiaResult | null>(null);
   const [flicker, setFlicker] = useState(false);
+  const [chaosEnabled, setChaosEnabled] = useState(true);
+  const [chaosIntensity, setChaosIntensity] = useState<"low" | "medium" | "high">("medium");
 
   const performSearch = useCallback(
     (nextQuery: string) => {
@@ -91,18 +94,47 @@ export function TimeMachineSection() {
     <main className={`tmx-world ${flicker ? "tmx-world-flicker" : ""}`}>
       <div className="tmx-noise" />
       <div className="tmx-scanlines" />
-      <PopupSystem memory={memory} enabled />
+      <PopupSystem memory={memory} enabled={chaosEnabled} intensity={chaosIntensity} />
 
       <header className="tmx-world-header">
         <div>
           <p className="tmx-pill">2016 TIME MACHINE — LIVE</p>
           <h1>Search-Powered Nostalgia Web</h1>
           <p>{memorySummary}</p>
+          <a href="/timemachine/process" className="tmx-process-link">
+            View Design Process Notes
+          </a>
         </div>
-        <SoundController autoStart={false} />
+        <div className="tmx-header-controls">
+          <SoundController autoStart={false} />
+          <section className="tmx-chaos-controls">
+            <p>Internet chaos</p>
+            <div>
+              <button type="button" className="tmx-open-button" onClick={() => setChaosEnabled((value) => !value)}>
+                {chaosEnabled ? "Chaos ON" : "Chaos OFF"}
+              </button>
+              <select
+                value={chaosIntensity}
+                onChange={(event) => setChaosIntensity(event.target.value as "low" | "medium" | "high")}
+                className="tmx-intensity-select"
+                aria-label="Chaos intensity"
+                disabled={!chaosEnabled}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </section>
+        </div>
       </header>
 
+      <p className="tmx-status-note" role="status" aria-live="polite">
+        {searching ? "Searching 2016 internet..." : "Search ready. Open results to view simulated pages."}
+      </p>
+
       <NostalgiaSearchBar initialQuery={query || memory.interests} searching={searching} onSearch={performSearch} />
+      <JudgeNotesPanel />
 
       <ResultsFeed
         results={results}

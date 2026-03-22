@@ -10,6 +10,7 @@ const MAIN_GAIN = 0.22;
 
 export function SoundController({ autoStart = false }: SoundControllerProps) {
   const [enabled, setEnabled] = useState(autoStart);
+  const [volumePct, setVolumePct] = useState(65);
   const contextRef = useRef<AudioContext | null>(null);
   const gainRef = useRef<GainNode | null>(null);
   const timersRef = useRef<number[]>([]);
@@ -54,7 +55,7 @@ export function SoundController({ autoStart = false }: SoundControllerProps) {
 
       const context = new AudioContextCtor();
       const master = context.createGain();
-      master.gain.value = MAIN_GAIN;
+      master.gain.value = MAIN_GAIN * 0.65;
       master.connect(context.destination);
 
       contextRef.current = context;
@@ -79,10 +80,11 @@ export function SoundController({ autoStart = false }: SoundControllerProps) {
     const master = gainRef.current;
     const context = contextRef.current;
     if (master && context) {
+      const target = MAIN_GAIN * (volumePct / 100);
       master.gain.cancelScheduledValues(context.currentTime);
-      master.gain.linearRampToValueAtTime(enabled ? MAIN_GAIN : 0.0001, context.currentTime + 0.12);
+      master.gain.linearRampToValueAtTime(enabled ? target : 0.0001, context.currentTime + 0.12);
     }
-  }, [enabled, init]);
+  }, [enabled, init, volumePct]);
 
   useEffect(() => {
     const onType = () => tone(440 + Math.random() * 50, 0.05, 0.028, "square");
@@ -115,6 +117,19 @@ export function SoundController({ autoStart = false }: SoundControllerProps) {
   return (
     <section className="tmx-sound-card">
       <p>Background immersion</p>
+      <label className="tmx-volume-label" htmlFor="tmx-volume">
+        Volume: {volumePct}%
+      </label>
+      <input
+        id="tmx-volume"
+        type="range"
+        min={20}
+        max={100}
+        step={5}
+        value={volumePct}
+        onChange={(event) => setVolumePct(Number(event.target.value))}
+        className="tmx-volume-slider"
+      />
       <div>
         <button type="button" className="tmx-open-button" onClick={() => setEnabled((value) => !value)}>
           {enabled ? "Sound ON" : "Sound OFF"}

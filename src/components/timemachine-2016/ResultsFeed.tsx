@@ -29,6 +29,7 @@ export function ResultsFeed({ results, searching, onOpenResult }: ResultsFeedPro
   const [flipping, setFlipping] = useState(false);
   const [bottleRotation, setBottleRotation] = useState(0);
   const [flipScore, setFlipScore] = useState(0);
+  const [filter, setFilter] = useState<"all" | NostalgiaResult["type"]>("all");
 
   const message = useMemo(() => {
     if (searching) {
@@ -36,6 +37,13 @@ export function ResultsFeed({ results, searching, onOpenResult }: ResultsFeedPro
     }
     return `${results.length} weird results from the old internet`;
   }, [results.length, searching]);
+
+  const visibleResults = useMemo(() => {
+    if (filter === "all") {
+      return results;
+    }
+    return results.filter((result) => result.type === filter);
+  }, [filter, results]);
 
   const flipBottle = () => {
     if (flipping) {
@@ -62,10 +70,22 @@ export function ResultsFeed({ results, searching, onOpenResult }: ResultsFeedPro
       <header className="tmx-results-header">
         <h2>Mixed 2016 Results Feed</h2>
         <p>{message}</p>
+        <div className="tmx-filter-row" role="toolbar" aria-label="Filter result types">
+          {(["all", "video", "tumblr", "buzzfeed", "meme", "forum"] as const).map((entry) => (
+            <button
+              key={entry}
+              type="button"
+              className={`tmx-filter-pill ${filter === entry ? "tmx-filter-pill-active" : ""}`}
+              onClick={() => setFilter(entry)}
+            >
+              {entry}
+            </button>
+          ))}
+        </div>
       </header>
 
       <div className="tmx-results-grid">
-        {results.map((result, index) => (
+        {visibleResults.map((result, index) => (
           <article
             key={result.id}
             className={`tmx-result-card tmx-type-${result.type}`}
@@ -93,6 +113,10 @@ export function ResultsFeed({ results, searching, onOpenResult }: ResultsFeedPro
           </article>
         ))}
       </div>
+
+      {!searching && visibleResults.length === 0 ? (
+        <p className="tmx-empty-state">No results in this filter yet. Try another filter or run a new search.</p>
+      ) : null}
 
       <aside className="tmx-game-box">
         <h3>Bottle Flip Break</h3>

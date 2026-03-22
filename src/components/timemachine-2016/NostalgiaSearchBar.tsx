@@ -22,8 +22,12 @@ export function NostalgiaSearchBar({ initialQuery, searching, onSearch }: Nostal
 
   return (
     <section className="tmx-search-wrap">
-      <form onSubmit={submit} className="tmx-search-form">
+      <form onSubmit={submit} className="tmx-search-form" role="search" aria-label="Nostalgia search">
+        <label htmlFor="tmx-search-input" className="tmx-visually-hidden">
+          Search the 2016 internet simulation
+        </label>
         <input
+          id="tmx-search-input"
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);
@@ -37,7 +41,11 @@ export function NostalgiaSearchBar({ initialQuery, searching, onSearch }: Nostal
         </button>
       </form>
 
-      {searching ? <p className="tmx-search-loading">Searching 2016 internet...</p> : null}
+      {searching ? (
+        <p className="tmx-search-loading" role="status" aria-live="polite">
+          Searching 2016 internet...
+        </p>
+      ) : null}
     </section>
   );
 }
