@@ -45,6 +45,14 @@ If your frontend runs on a custom origin, set:
 export NEXT_PUBLIC_APP_ORIGIN=http://localhost:3000
 ```
 
+For the Nostalgia search engine (`/`), add a Bing key:
+
+```bash
+cp .env.example .env.local
+```
+
+Then set `NEXT_PUBLIC_SEARCH_API_KEY` in `.env.local`.
+
 ## Product flow
 
 1. Landing (`/`) with hero, ambient visuals, and “Receive Your Drop”

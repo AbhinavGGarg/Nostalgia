@@ -21,9 +21,9 @@ const vt323 = VT323({
 });
 
 export const metadata: Metadata = {
-  title: "Nostalgia — A Personalized Digital Time Machine",
+  title: "NOSTALGIA — The 2016 Internet Search Engine",
   description:
-    "Immersive, chaotic, personalized recreation of 2016 internet culture with mixed feeds, mini-games, camera filters, and timeline collapse.",
+    "Search like it's 2016 with delayed loading, old-web result styling, injected nostalgia content, and chaotic internet popups.",
 };
 
 export default function RootLayout({

@@ -1,5 +1,5 @@
-import { TimeMachineExperience } from "@/components/time-machine/TimeMachineExperience";
+import { NostalgiaSearchApp } from "@/components/nostalgia-search/app";
 
 export default function HomePage() {
-  return <TimeMachineExperience />;
+  return <NostalgiaSearchApp />;
 }
