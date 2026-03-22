@@ -61,7 +61,7 @@ export function TransitionScreen({ profile, onComplete }: TransitionScreenProps)
 
         <div className="mt-5 grid grid-cols-2 gap-3 text-[11px] sm:text-xs">
           <div className="rounded-xl border border-white/45 bg-white/10 p-3">Favorite apps synced: {profile.favoriteApps.join(", ")}</div>
-          <div className="rounded-xl border border-white/45 bg-white/10 p-3">Vibe signature: {profile.vibe}</div>
+          <div className="rounded-xl border border-white/45 bg-white/10 p-3">Vibe signature: {profile.vibes.join(", ")}</div>
         </div>
       </section>
     </main>

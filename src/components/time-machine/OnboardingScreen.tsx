@@ -44,13 +44,14 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const [ageIn2016Input, setAgeIn2016Input] = useState("");
   const [favoriteApps, setFavoriteApps] = useState<FavoriteApp[]>([]);
   const [favoriteContent, setFavoriteContent] = useState("memes, pop music, bottle flipping");
-  const [vibe, setVibe] = useState<PersonalityVibe>("chaotic");
+  const [vibes, setVibes] = useState<PersonalityVibe[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const parsedAgeIn2016 = Number.parseInt(ageIn2016Input, 10);
   const hasValidAge = Number.isFinite(parsedAgeIn2016) && parsedAgeIn2016 >= 1 && parsedAgeIn2016 <= 120;
   const hasSelectedApps = favoriteApps.length > 0;
+  const hasSelectedVibes = vibes.length > 0;
 
   const loadingLabel = useMemo(
     () => LOADING_STEPS[Math.min(LOADING_STEPS.length - 1, Math.floor(progress / 22))],
@@ -72,7 +73,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
               ageIn2016: hasValidAge ? parsedAgeIn2016 : 16,
               favoriteApps,
               favoriteContent,
-              vibe,
+              vibes,
             });
           }, 420);
         }
@@ -81,7 +82,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     }, 290);
 
     return () => window.clearInterval(interval);
-  }, [favoriteApps, favoriteContent, hasValidAge, isLoading, onComplete, parsedAgeIn2016, vibe]);
+  }, [favoriteApps, favoriteContent, hasValidAge, isLoading, onComplete, parsedAgeIn2016, vibes]);
 
   const toggleApp = (app: FavoriteApp) => {
     setFavoriteApps((current) => {
@@ -89,6 +90,16 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         return current.filter((value) => value !== app);
       }
       return [...current, app];
+    });
+    setSubmitError(null);
+  };
+
+  const toggleVibe = (entry: PersonalityVibe) => {
+    setVibes((current) => {
+      if (current.includes(entry)) {
+        return current.filter((value) => value !== entry);
+      }
+      return [...current, entry];
     });
     setSubmitError(null);
   };
@@ -101,6 +112,10 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     }
     if (!hasSelectedApps) {
       setSubmitError("Pick at least 1 favorite app to continue.");
+      return;
+    }
+    if (!hasSelectedVibes) {
+      setSubmitError("Pick at least 1 personality vibe to continue.");
       return;
     }
     setSubmitError(null);
@@ -146,15 +161,15 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
           </label>
 
           <label className="retro-input-wrap sm:col-span-1">
-            <span className="retro-label">Personality vibe</span>
+            <span className="retro-label">Personality vibes (pick 1+)</span>
             <div className="flex flex-wrap gap-2">
               {VIBES.map((entry) => (
                 <button
                   key={entry}
                   type="button"
                   disabled={isLoading}
-                  onClick={() => setVibe(entry)}
-                  className={`retro-pill ${vibe === entry ? "retro-pill-active" : ""}`}
+                  onClick={() => toggleVibe(entry)}
+                  className={`retro-pill ${vibes.includes(entry) ? "retro-pill-active" : ""}`}
                 >
                   {entry}
                 </button>

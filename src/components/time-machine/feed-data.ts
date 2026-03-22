@@ -70,7 +70,8 @@ export function createPersonalizedFeed(profile: UserProfile): FeedItem[] {
   const chosenAppSeeds = profile.favoriteApps.length
     ? profile.favoriteApps.flatMap((app) => APP_SEEDS[app])
     : APP_SEEDS.Instagram;
-  const moods = VIBE_TO_MOOD[profile.vibe];
+  const selectedVibes = profile.vibes.length > 0 ? profile.vibes : ["aesthetic"];
+  const moods = selectedVibes.flatMap((entry) => VIBE_TO_MOOD[entry]);
 
   const baseItems: FeedItem[] = Array.from({ length: 16 }, (_, index) => {
     const platformIndex = index % 3;
@@ -87,7 +88,7 @@ export function createPersonalizedFeed(profile: UserProfile): FeedItem[] {
         caption: `${appSeed} | #${term.replace(/\s+/g, "")} #2016mood`,
         timestamp: pick(TIMESTAMPS),
         likes: 78 + Math.floor(Math.random() * 921),
-        imageUrl: seedImage(`${term}-${profile.vibe}-${index}`),
+        imageUrl: seedImage(`${term}-${selectedVibes.join("-")}-${index}`),
         mood,
       };
     }

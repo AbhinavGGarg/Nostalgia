@@ -77,7 +77,7 @@ export function TimeMachineExperience() {
         </div>
         <div className="text-right text-[11px] text-pink-100">
           <p>apps: {profile.favoriteApps.join(", ")}</p>
-          <p>vibe: {profile.vibe}</p>
+          <p>vibes: {profile.vibes.join(", ")}</p>
           <p>content: {profile.favoriteContent}</p>
         </div>
       </header>

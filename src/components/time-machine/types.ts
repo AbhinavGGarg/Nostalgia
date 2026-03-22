@@ -27,7 +27,7 @@ export type UserProfile = {
   ageIn2016: number;
   favoriteApps: FavoriteApp[];
   favoriteContent: string;
-  vibe: PersonalityVibe;
+  vibes: PersonalityVibe[];
 };
 
 export type FeedPlatform = "instagram" | "tumblr" | "twitter";
