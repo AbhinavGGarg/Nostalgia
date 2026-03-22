@@ -70,7 +70,7 @@ export function createPersonalizedFeed(profile: UserProfile): FeedItem[] {
   const chosenAppSeeds = profile.favoriteApps.length
     ? profile.favoriteApps.flatMap((app) => APP_SEEDS[app])
     : APP_SEEDS.Instagram;
-  const selectedVibes = profile.vibes.length > 0 ? profile.vibes : ["aesthetic"];
+  const selectedVibes: PersonalityVibe[] = profile.vibes.length > 0 ? profile.vibes : ["aesthetic"];
   const moods = selectedVibes.flatMap((entry) => VIBE_TO_MOOD[entry]);
 
   const baseItems: FeedItem[] = Array.from({ length: 16 }, (_, index) => {
