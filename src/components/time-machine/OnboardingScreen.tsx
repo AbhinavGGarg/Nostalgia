@@ -8,7 +8,19 @@ type OnboardingScreenProps = {
 };
 
 const APPS: FavoriteApp[] = ["Instagram", "Snapchat", "Musical.ly", "Vine", "YouTube"];
-const VIBES: PersonalityVibe[] = ["funny", "aesthetic", "chaotic", "introverted", "edgy", "soft"];
+const VIBES: PersonalityVibe[] = [
+  "funny",
+  "aesthetic",
+  "chaotic",
+  "introverted",
+  "edgy",
+  "soft",
+  "main-character",
+  "daydreamer",
+  "gamer",
+  "romantic",
+  "hype",
+];
 const LOADING_STEPS = [
   "Rewinding time...",
   "Restoring your 2016...",
@@ -18,12 +30,14 @@ const LOADING_STEPS = [
 ];
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
-  const [ageIn2016, setAgeIn2016] = useState(14);
+  const [ageIn2016Input, setAgeIn2016Input] = useState("");
   const [favoriteApps, setFavoriteApps] = useState<FavoriteApp[]>(["Instagram", "Snapchat"]);
   const [favoriteContent, setFavoriteContent] = useState("memes, pop music, bottle flipping");
   const [vibe, setVibe] = useState<PersonalityVibe>("chaotic");
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const parsedAgeIn2016 = Number.parseInt(ageIn2016Input, 10);
+  const hasValidAge = Number.isFinite(parsedAgeIn2016) && parsedAgeIn2016 >= 1 && parsedAgeIn2016 <= 120;
 
   const loadingLabel = useMemo(
     () => LOADING_STEPS[Math.min(LOADING_STEPS.length - 1, Math.floor(progress / 22))],
@@ -42,7 +56,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
           window.clearInterval(interval);
           window.setTimeout(() => {
             onComplete({
-              ageIn2016,
+              ageIn2016: hasValidAge ? parsedAgeIn2016 : 16,
               favoriteApps,
               favoriteContent,
               vibe,
@@ -54,7 +68,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     }, 290);
 
     return () => window.clearInterval(interval);
-  }, [ageIn2016, favoriteApps, favoriteContent, isLoading, onComplete, vibe]);
+  }, [favoriteApps, favoriteContent, hasValidAge, isLoading, onComplete, parsedAgeIn2016, vibe]);
 
   const toggleApp = (app: FavoriteApp) => {
     setFavoriteApps((current) => {
@@ -68,6 +82,9 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!hasValidAge) {
+      return;
+    }
     setProgress(0);
     setIsLoading(true);
   };
@@ -96,11 +113,12 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
             <span className="retro-label">Age in 2016</span>
             <input
               type="number"
-              min={8}
-              max={35}
-              value={ageIn2016}
+              min={1}
+              max={120}
+              value={ageIn2016Input}
+              placeholder="Type your age (e.g. 7)"
               disabled={isLoading}
-              onChange={(event) => setAgeIn2016(Number(event.target.value) || 14)}
+              onChange={(event) => setAgeIn2016Input(event.target.value)}
               className="retro-input"
             />
           </label>
@@ -152,7 +170,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
           </label>
 
           <div className="sm:col-span-2">
-            <button type="submit" disabled={isLoading} className="retro-submit">
+            <button type="submit" disabled={isLoading || !hasValidAge} className="retro-submit">
               {isLoading ? "Initializing Time Machine..." : "Start My 2016"}
             </button>
           </div>

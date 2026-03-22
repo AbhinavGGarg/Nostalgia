@@ -20,6 +20,11 @@ const VIBE_TO_MOOD: Record<PersonalityVibe, string[]> = {
   introverted: ["late-night scrolling", "soft thoughts", "quiet lyric posts"],
   edgy: ["grainy black-and-white", "cryptic captions", "moody remixes"],
   soft: ["dreamy moodboard", "cozy pixel skies", "gentle nostalgia"],
+  "main-character": ["cinematic bus window moments", "dramatic caption energy", "soundtrack-core"],
+  daydreamer: ["cloudy neon thoughts", "imagination spirals", "soft-focus universe"],
+  gamer: ["late-night rank grind", "lobby banter", "victory screenshot flex"],
+  romantic: ["heart-eyes playlists", "crush-coded posts", "hopeless but iconic"],
+  hype: ["all-caps excitement", "party timeline", "unstoppable weekend energy"],
 };
 
 const APP_SEEDS: Record<FavoriteApp, string[]> = {

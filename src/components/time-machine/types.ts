@@ -6,7 +6,12 @@ export type PersonalityVibe =
   | "chaotic"
   | "introverted"
   | "edgy"
-  | "soft";
+  | "soft"
+  | "main-character"
+  | "daydreamer"
+  | "gamer"
+  | "romantic"
+  | "hype";
 
 export type UserProfile = {
   ageIn2016: number;
