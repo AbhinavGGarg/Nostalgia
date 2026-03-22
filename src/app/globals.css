@@ -518,6 +518,21 @@ body {
   margin: 0 0 1rem;
 }
 
+.search2016-result-hit {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.search2016-result-hit:focus-visible {
+  outline: 2px solid rgba(104, 238, 255, 0.85);
+  outline-offset: 3px;
+  border-radius: 1rem;
+}
+
 .search2016-card {
   border-radius: 1rem;
   border: 2px solid rgba(255, 255, 255, 0.4);
@@ -699,6 +714,78 @@ body {
   letter-spacing: 0.04em;
 }
 
+.interaction-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  background: rgba(7, 3, 20, 0.7);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.interaction-modal {
+  width: min(92vw, 660px);
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 1.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.48);
+  background:
+    linear-gradient(155deg, rgba(255, 130, 196, 0.2), rgba(93, 227, 255, 0.14) 45%, rgba(13, 7, 45, 0.76)),
+    rgba(0, 0, 0, 0.3);
+  box-shadow: 0 22px 55px rgba(6, 4, 20, 0.66);
+  padding: 0.9rem;
+}
+
+.interaction-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.interaction-head h3 {
+  margin: 0.28rem 0 0;
+  line-height: 1;
+}
+
+.interaction-head p {
+  margin: 0.25rem 0 0;
+}
+
+.interaction-image-wrap {
+  margin-top: 0.75rem;
+  position: relative;
+  border-radius: 0.9rem;
+  min-height: 230px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.34);
+}
+
+.interaction-body {
+  margin: 0.75rem 0 0;
+  color: #f6fdff;
+  font-size: 0.96rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.interaction-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.interaction-reply {
+  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+}
+
 @keyframes slide-in-pop {
   from {
     transform: translateX(12px) scale(0.96);
@@ -760,6 +847,10 @@ body {
 
   .catch-zone {
     height: 128px;
+  }
+
+  .interaction-reply {
+    grid-template-columns: 1fr;
   }
 }
 

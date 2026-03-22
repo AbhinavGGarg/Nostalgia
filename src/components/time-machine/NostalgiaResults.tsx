@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { InteractionModal, type InteractionModalItem } from "./InteractionModal";
 import type { NostalgiaSearchResult } from "./nostalgia-search-data";
 import { ResultCardBuzzfeed } from "./ResultCardBuzzfeed";
 import { ResultCardForum } from "./ResultCardForum";
@@ -36,6 +38,64 @@ function renderCard(result: NostalgiaSearchResult) {
 }
 
 export function NostalgiaResults({ query, results, searching, searchStarted, flicker }: NostalgiaResultsProps) {
+  const [activeResult, setActiveResult] = useState<InteractionModalItem | null>(null);
+
+  const openResult = (result: NostalgiaSearchResult) => {
+    if (result.kind === "video") {
+      setActiveResult({
+        id: result.id,
+        title: result.title,
+        subtitle: `${result.channel} • ${result.views}`,
+        body: `Throwback video result for "${query}". Clicks, comments, and replay loops were the whole vibe.`,
+        imageUrl: result.imageUrl,
+        source: "search",
+      });
+      return;
+    }
+
+    if (result.kind === "tumblr") {
+      setActiveResult({
+        id: result.id,
+        title: "Tumblr Thought",
+        subtitle: `@${result.blog} • ${result.notes}`,
+        body: result.quote,
+        source: "search",
+      });
+      return;
+    }
+
+    if (result.kind === "buzzfeed") {
+      setActiveResult({
+        id: result.id,
+        title: result.headline,
+        subtitle: "Buzz article • listicle mode",
+        body: result.bullets.join(" • "),
+        source: "search",
+      });
+      return;
+    }
+
+    if (result.kind === "meme") {
+      setActiveResult({
+        id: result.id,
+        title: result.topText,
+        subtitle: "Meme result • low quality peak humor",
+        body: result.caption,
+        imageUrl: result.imageUrl,
+        source: "search",
+      });
+      return;
+    }
+
+    setActiveResult({
+      id: result.id,
+      title: result.question,
+      subtitle: `${result.asker} • ${result.replies}`,
+      body: result.bestAnswer,
+      source: "search",
+    });
+  };
+
   return (
     <section className={`retro-panel flex h-full min-h-[650px] flex-col p-4 sm:p-5 ${flicker ? "vhs-flicker" : ""}`}>
       <div className="mb-4 flex items-center justify-between gap-2">
@@ -82,12 +142,16 @@ export function NostalgiaResults({ query, results, searching, searchStarted, fli
                   marginRight: `${(index % 2) * 4}px`,
                 }}
               >
-                {renderCard(result)}
+                <button type="button" className="search2016-result-hit" onClick={() => openResult(result)}>
+                  {renderCard(result)}
+                </button>
               </div>
             ))}
           </div>
         ) : null}
       </div>
+
+      <InteractionModal key={activeResult?.id ?? "none"} item={activeResult} onClose={() => setActiveResult(null)} />
     </section>
   );
 }

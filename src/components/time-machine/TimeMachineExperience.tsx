@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CameraMode } from "./CameraMode";
 import { MainFeed } from "./MainFeed";
 import { MiniGames } from "./MiniGames";
@@ -10,10 +10,9 @@ import { generateNostalgiaSearchResults, nostalgiaSearchDelayMs, type NostalgiaS
 import { NostalgiaSearchBar } from "./NostalgiaSearchBar";
 import { OnboardingScreen } from "./OnboardingScreen";
 import { PopupSystem } from "./PopupSystem";
-import { TimeCollapse } from "./TimeCollapse";
 import { TransitionScreen } from "./TransitionScreen";
 import { TumblrMode } from "./TumblrMode";
-import type { CollapseStage, UserProfile } from "./types";
+import type { UserProfile } from "./types";
 
 type AppStage = "onboarding" | "transition" | "experience";
 type ExperienceView = "feed" | "explore";
@@ -23,8 +22,6 @@ const LOADING_MESSAGES = ["Searching 2016 internet...", "Connecting to old serve
 export function TimeMachineExperience() {
   const [stage, setStage] = useState<AppStage>("onboarding");
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [collapseStage, setCollapseStage] = useState<CollapseStage>(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [searchResults, setSearchResults] = useState<NostalgiaSearchResult[]>([]);
@@ -59,19 +56,6 @@ export function TimeMachineExperience() {
     };
   }, []);
 
-  const stageClass = useMemo(() => {
-    if (collapseStage === 1) {
-      return "stage-drifting";
-    }
-    if (collapseStage === 2) {
-      return "stage-bleeding";
-    }
-    if (collapseStage === 3) {
-      return "stage-collapsing";
-    }
-    return "";
-  }, [collapseStage]);
-
   if (stage === "onboarding") {
     return (
       <OnboardingScreen
@@ -93,11 +77,24 @@ export function TimeMachineExperience() {
         profile={profile}
         onComplete={() => {
           setStage("experience");
-          setStartedAt(Date.now());
         }}
       />
     );
   }
+
+  const returnToSetup = () => {
+    clearSearchTimers();
+    setSearching(false);
+    setSearchStarted(false);
+    setSearchFlicker(false);
+    setLoadingMessage(LOADING_MESSAGES[0]);
+    setActiveView("feed");
+    setSearchQuery("");
+    setSubmittedQuery("");
+    setSearchResults([]);
+    setProfile(null);
+    setStage("onboarding");
+  };
 
   const runSearch = () => {
     if (searching) {
@@ -141,7 +138,7 @@ export function TimeMachineExperience() {
   };
 
   return (
-    <main className={`relative min-h-screen overflow-hidden px-3 pb-24 pt-4 sm:px-5 sm:pt-6 ${stageClass}`}>
+    <main className="relative min-h-screen overflow-hidden px-3 pb-24 pt-4 sm:px-5 sm:pt-6">
       <div className="vhs-noise pointer-events-none absolute inset-0 opacity-45" />
       <div className="scanlines pointer-events-none absolute inset-0 opacity-35" />
       <div className="pointer-events-none absolute -left-24 top-20 h-80 w-80 rounded-full bg-pink-500/30 blur-3xl" />
@@ -169,6 +166,9 @@ export function TimeMachineExperience() {
           <p>apps: {profile.favoriteApps.join(", ")}</p>
           <p>vibes: {profile.vibes.join(", ")}</p>
           <p>content: {profile.favoriteContent}</p>
+          <button type="button" className="retro-micro-btn mt-2" onClick={returnToSetup}>
+            Back To Setup
+          </button>
         </div>
       </header>
 
@@ -201,8 +201,6 @@ export function TimeMachineExperience() {
           </section>
         </div>
       </section>
-
-      {startedAt ? <TimeCollapse startedAt={startedAt} onStageChange={setCollapseStage} /> : null}
     </main>
   );
 }

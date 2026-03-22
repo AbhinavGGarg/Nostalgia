@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { createPersonalizedFeed } from "./feed-data";
+import { InteractionModal, type InteractionModalItem } from "./InteractionModal";
 import type { FeedItem, UserProfile } from "./types";
 
 type MainFeedProps = {
@@ -25,6 +26,7 @@ export function MainFeed({ profile }: MainFeedProps) {
   const feed = useMemo(() => createPersonalizedFeed(profile), [profile]);
   const [liked, setLiked] = useState<Record<string, boolean>>({});
   const [lagging, setLagging] = useState<LagMap>({});
+  const [activePost, setActivePost] = useState<InteractionModalItem | null>(null);
 
   const queueLike = (id: string) => {
     if (lagging[id]) {
@@ -53,8 +55,33 @@ export function MainFeed({ profile }: MainFeedProps) {
         {feed.map((item, index) => (
           <article
             key={item.id}
-            className="retro-feed-card"
+            className="retro-feed-card cursor-pointer"
             style={{ transform: `rotate(${(index % 3 - 1) * 0.65}deg)` }}
+            role="button"
+            tabIndex={0}
+            onClick={() =>
+              setActivePost({
+                id: item.id,
+                title: `${platformLabel(item)} post`,
+                subtitle: `${item.handle} • ${item.timestamp}`,
+                body: `${item.caption} \n\nmood: ${item.mood}`,
+                imageUrl: item.imageUrl,
+                source: "post",
+              })
+            }
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setActivePost({
+                  id: item.id,
+                  title: `${platformLabel(item)} post`,
+                  subtitle: `${item.handle} • ${item.timestamp}`,
+                  body: `${item.caption} \n\nmood: ${item.mood}`,
+                  imageUrl: item.imageUrl,
+                  source: "post",
+                });
+              }
+            }}
           >
             <header className="mb-3 flex items-center justify-between text-xs">
               <div>
@@ -85,8 +112,32 @@ export function MainFeed({ profile }: MainFeedProps) {
             <p className="mt-1 text-xs text-cyan-50/75">mood: {item.mood}</p>
 
             <footer className="mt-3 flex flex-wrap items-center gap-2 text-xs text-pink-100">
-              <button type="button" onClick={() => queueLike(item.id)} className="retro-micro-btn">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  queueLike(item.id);
+                }}
+                className="retro-micro-btn"
+              >
                 {lagging[item.id] ? "buffering..." : liked[item.id] ? "liked <3" : "like"}
+              </button>
+              <button
+                type="button"
+                className="retro-micro-btn"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActivePost({
+                    id: item.id,
+                    title: `${platformLabel(item)} post`,
+                    subtitle: `${item.handle} • ${item.timestamp}`,
+                    body: `${item.caption} \n\nmood: ${item.mood}`,
+                    imageUrl: item.imageUrl,
+                    source: "post",
+                  });
+                }}
+              >
+                open post
               </button>
               <span>{item.likes ? `${item.likes + (liked[item.id] ? 1 : 0)} likes` : ""}</span>
               <span>{item.notes ? `${item.notes} notes` : ""}</span>
@@ -95,6 +146,8 @@ export function MainFeed({ profile }: MainFeedProps) {
           </article>
         ))}
       </div>
+
+      <InteractionModal key={activePost?.id ?? "none"} item={activePost} onClose={() => setActivePost(null)} />
     </section>
   );
 }
