@@ -24,6 +24,7 @@ function computeStage(elapsedSeconds: number): CollapseStage {
 export function TimeCollapse({ startedAt, onStageChange }: TimeCollapseProps) {
   const [elapsed, setElapsed] = useState(0);
   const [stage, setStage] = useState<CollapseStage>(0);
+  const [finalPanelDismissed, setFinalPanelDismissed] = useState(false);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -55,6 +56,20 @@ export function TimeCollapse({ startedAt, onStageChange }: TimeCollapseProps) {
     return "2016/2026 collapse underway";
   }, [stage]);
 
+  const showFinalPanel = stage === 3 && !finalPanelDismissed;
+
+  useEffect(() => {
+    if (!showFinalPanel) {
+      return;
+    }
+
+    const autoDismissTimer = window.setTimeout(() => {
+      setFinalPanelDismissed(true);
+    }, 12000);
+
+    return () => window.clearTimeout(autoDismissTimer);
+  }, [showFinalPanel]);
+
   if (stage === 0) {
     return null;
   }
@@ -77,9 +92,9 @@ export function TimeCollapse({ startedAt, onStageChange }: TimeCollapseProps) {
         </>
       ) : null}
 
-      {stage === 3 ? (
-        <section className="collapse-final fixed inset-0 z-30 flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl rounded-3xl border-2 border-white/55 bg-[linear-gradient(145deg,rgba(12,8,42,0.9),rgba(203,217,248,0.18))] p-5 shadow-[0_18px_70px_rgba(9,8,33,0.6)] backdrop-blur-md sm:p-8">
+      {showFinalPanel ? (
+        <section className="collapse-final pointer-events-none fixed inset-0 z-30 flex items-center justify-center p-4">
+          <div className="pointer-events-auto w-full max-w-3xl rounded-3xl border-2 border-white/55 bg-[linear-gradient(145deg,rgba(12,8,42,0.9),rgba(203,217,248,0.18))] p-5 shadow-[0_18px_70px_rgba(9,8,33,0.6)] backdrop-blur-md sm:p-8">
             <h3 className="font-chaos text-3xl text-white sm:text-4xl">2016 vs 2026</h3>
             <p className="mt-2 text-sm text-cyan-50">
               Raw, messy, human timelines are colliding with polished, optimized feeds.
@@ -94,6 +109,11 @@ export function TimeCollapse({ startedAt, onStageChange }: TimeCollapseProps) {
                 <p className="font-pixel text-[10px] text-slate-700">2026 FEELING</p>
                 <p className="mt-1 text-sm font-semibold">optimized visibility, algorithm pressure, polished identity loops</p>
               </div>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button type="button" className="retro-micro-btn" onClick={() => setFinalPanelDismissed(true)}>
+                Keep Exploring
+              </button>
             </div>
           </div>
         </section>

@@ -17,6 +17,7 @@ const PROGRESSION = [
   [220.0, 277.18, 349.23],
   [246.94, 311.13, 392.0],
 ];
+const ACTIVE_MASTER_GAIN = 0.28;
 
 export function MusicPlayer({ autoStart = true }: MusicPlayerProps) {
   const [enabled, setEnabled] = useState(autoStart);
@@ -68,7 +69,7 @@ export function MusicPlayer({ autoStart = true }: MusicPlayerProps) {
 
       const context = new AudioContextCtor();
       const masterGain = context.createGain();
-      masterGain.gain.value = 0.11;
+      masterGain.gain.value = ACTIVE_MASTER_GAIN;
       masterGain.connect(context.destination);
 
       contextRef.current = context;
@@ -84,7 +85,7 @@ export function MusicPlayer({ autoStart = true }: MusicPlayerProps) {
       const noiseGain = context.createGain();
       noise.buffer = buffer;
       noise.loop = true;
-      noiseGain.gain.value = 0.015;
+      noiseGain.gain.value = 0.02;
       noise.connect(noiseGain);
       noiseGain.connect(masterGain);
       noise.start();
@@ -96,7 +97,7 @@ export function MusicPlayer({ autoStart = true }: MusicPlayerProps) {
         const chord = PROGRESSION[chordIndex % PROGRESSION.length];
         chord.forEach((note, position) => {
           window.setTimeout(() => {
-            playTone(note, 0.36, "sine", position === 0 ? 0.025 : 0.018);
+            playTone(note, 0.36, "sine", position === 0 ? 0.06 : 0.045);
           }, position * 28);
         });
         chordIndex += 1;
@@ -104,7 +105,7 @@ export function MusicPlayer({ autoStart = true }: MusicPlayerProps) {
 
       const bassTimer = window.setInterval(() => {
         const bass = PROGRESSION[(chordIndex + 1) % PROGRESSION.length][0] / 2;
-        playTone(bass, 0.21, "triangle", 0.02);
+        playTone(bass, 0.21, "triangle", 0.052);
       }, 540);
 
       cleanupRef.current.sequenceTimers = [chordTimer, bassTimer];
@@ -124,16 +125,16 @@ export function MusicPlayer({ autoStart = true }: MusicPlayerProps) {
     const master = masterGainRef.current;
     if (master && contextRef.current) {
       master.gain.cancelScheduledValues(contextRef.current.currentTime);
-      master.gain.linearRampToValueAtTime(enabled ? 0.11 : 0.0001, contextRef.current.currentTime + 0.15);
+      master.gain.linearRampToValueAtTime(enabled ? ACTIVE_MASTER_GAIN : 0.0001, contextRef.current.currentTime + 0.15);
     }
   }, [bootAudio, enabled]);
 
   useEffect(() => {
-    const onNotify = () => playTone(860, 0.08, "square", 0.022);
-    const onType = () => playTone(420 + Math.random() * 80, 0.05, "square", 0.012);
+    const onNotify = () => playTone(860, 0.08, "square", 0.045);
+    const onType = () => playTone(420 + Math.random() * 80, 0.05, "square", 0.024);
     const onGlitch = () => {
-      playTone(220, 0.23, "sawtooth", 0.04);
-      window.setTimeout(() => playTone(132, 0.2, "triangle", 0.03), 80);
+      playTone(220, 0.23, "sawtooth", 0.075);
+      window.setTimeout(() => playTone(132, 0.2, "triangle", 0.058), 80);
     };
 
     window.addEventListener("tm2016-notify", onNotify);
