@@ -1,23 +1,24 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { useMemo, useRef, useState } from "react";
+import { PlaylistSidebar } from "./playlist-sidebar";
 import { ResultsList } from "./results-list";
 import { SearchBar } from "./search-bar";
 import type { InjectedResult, NostalgiaResult, RealResult, SearchApiPayload } from "./types";
 
 const LOADING_STEPS = ["Connecting to 2016 internet...", "Searching archived web...", "Indexing old pages..."] as const;
 const QUICK_PROMPTS = [
-  "youtube gaming",
-  "snapchat stories",
+  "youtube",
+  "instagram 2016",
   "tumblr aesthetic quotes",
   "roblox 2016",
-  "fortnite first trailer",
   "best songs 2016",
-  "school memes",
+  "school memes 2016",
 ] as const;
 
 type SearchFilter = "all" | "videos" | "social" | "forums" | "articles";
+type ViewMode = "home" | "results";
 
 function buildInjected(query: string): InjectedResult[] {
   const focus = query.trim() || "internet";
@@ -87,6 +88,7 @@ function matchesFilter(item: NostalgiaResult, filter: SearchFilter) {
 }
 
 export function NostalgiaSearchApp() {
+  const [viewMode, setViewMode] = useState<ViewMode>("home");
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -134,6 +136,7 @@ export function NostalgiaSearchApp() {
     setWarning("");
     setActiveFilter("all");
     setLoadingMessage(LOADING_STEPS[0]);
+    setViewMode("results");
 
     let step = 0;
     if (loadingIntervalRef.current !== null) {
@@ -144,7 +147,7 @@ export function NostalgiaSearchApp() {
       setLoadingMessage(LOADING_STEPS[step]);
     }, 650);
 
-    const minDelay = 1000 + Math.floor(Math.random() * 700);
+    const minDelay = 900 + Math.floor(Math.random() * 600);
     const startedAt = Date.now();
 
     try {
@@ -193,96 +196,117 @@ export function NostalgiaSearchApp() {
     <main className="ns16-shell ns16-shell-clean">
       <div className="ns16-noise" />
 
-      <header className="ns16-toolbar">
-        <div className="ns16-brand">
-          <div className="ns16-brand-mark">
-            <Image src="/nostalgia-mark.svg" alt="Nostalgia logo" width={37} height={37} priority />
-          </div>
-          <div>
-            <h1>NOSTALGIA</h1>
-            <p>Search like it&apos;s 2016.</p>
-          </div>
-        </div>
+      <div className="ns16-app-grid">
+        <section className="ns16-main-panel">
+          {viewMode === "home" ? (
+            <div className="ns16-home">
+              <div className="ns16-home-logo-wrap">
+                <Image src="/nostalgia-mark.svg" alt="Nostalgia logo" width={66} height={66} priority />
+                <h1>NOSTALGIA</h1>
+              </div>
+              <p>Search like it&apos;s 2016</p>
+              <SearchBar value={query} searching={loading} onChange={setQuery} onSubmit={() => void runSearch()} onLucky={runLucky} />
 
-        <SearchBar value={query} searching={loading} onChange={setQuery} onSubmit={() => void runSearch()} onLucky={runLucky} compact />
-
-        <div className="ns16-quick-prompts">
-          {QUICK_PROMPTS.slice(0, 5).map((prompt) => (
-            <button key={prompt} type="button" onClick={() => void runSearch(prompt)}>
-              {prompt}
-            </button>
-          ))}
-        </div>
-      </header>
-
-      <section className="ns16-results-wrap ns16-results-wrap-clean">
-        <div className="ns16-results-meta">
-          {loading ? (
-            <p className="ns16-status">{loadingMessage}</p>
-          ) : hasResults ? (
-            <p>
-              Showing {filteredResults.length} result(s) for &quot;{submittedQuery}&quot;
-            </p>
+              <div className="ns16-home-pills">
+                {QUICK_PROMPTS.map((prompt) => (
+                  <button key={prompt} type="button" onClick={() => void runSearch(prompt)}>
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
           ) : (
-            <p>Search anything to start browsing.</p>
+            <div className="ns16-results-view">
+              <header className="ns16-toolbar">
+                <div className="ns16-brand">
+                  <button type="button" className="ns16-back-button" onClick={() => setViewMode("home")}>
+                    ← Back
+                  </button>
+                  <div className="ns16-brand-mark">
+                    <Image src="/nostalgia-mark.svg" alt="Nostalgia logo" width={37} height={37} priority />
+                  </div>
+                  <div>
+                    <h1>NOSTALGIA</h1>
+                    <p>Search like it&apos;s 2016.</p>
+                  </div>
+                </div>
+                <SearchBar
+                  value={query}
+                  searching={loading}
+                  onChange={setQuery}
+                  onSubmit={() => void runSearch()}
+                  onLucky={runLucky}
+                  compact
+                />
+              </header>
+
+              <section className="ns16-results-wrap ns16-results-wrap-clean">
+                <div className="ns16-results-meta">
+                  {loading ? (
+                    <p className="ns16-status">{loadingMessage}</p>
+                  ) : hasResults ? (
+                    <p>
+                      Showing {filteredResults.length} result(s) for &quot;{submittedQuery}&quot;
+                    </p>
+                  ) : (
+                    <p>Search anything to start browsing.</p>
+                  )}
+                  {!loading ? <p>{providerLabel}</p> : null}
+                  {warning && !loading ? <p className="ns16-warning">{warning}</p> : null}
+                </div>
+
+                <div className="ns16-filter-row" role="tablist" aria-label="Result filters">
+                  {(["all", "videos", "social", "forums", "articles"] as const).map((filter) => (
+                    <button
+                      key={filter}
+                      type="button"
+                      className={activeFilter === filter ? "is-active" : ""}
+                      onClick={() => setActiveFilter(filter)}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+
+                {savedItems.length > 0 ? (
+                  <div className="ns16-saved-strip">
+                    <p>Saved throwbacks ({savedItems.length})</p>
+                    <div>
+                      {savedItems.slice(0, 4).map((item) => (
+                        <a key={item.id} href={item.url} target="_blank" rel="noreferrer">
+                          {item.title}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {loading ? (
+                  <div className="ns16-loading-inline">
+                    <div className="ns16-loading-bar-wrap">
+                      <div className="ns16-loading-bar" />
+                    </div>
+                  </div>
+                ) : null}
+
+                {!loading && hasResults ? (
+                  <ResultsList items={filteredResults} savedIds={savedIdSet} onToggleSave={toggleSave} />
+                ) : null}
+
+                {!loading && !hasResults ? (
+                  <section className="ns16-empty">
+                    <h2>Nostalgia Search Engine</h2>
+                    <p>Type a query and press Search.</p>
+                    <p>Try: youtube, school memes, old tumblr, roblox 2016</p>
+                  </section>
+                ) : null}
+              </section>
+            </div>
           )}
-          {!loading ? <p>{providerLabel}</p> : null}
-          {warning && !loading ? <p className="ns16-warning">{warning}</p> : null}
-        </div>
+        </section>
 
-        <div className="ns16-filter-row" role="tablist" aria-label="Result filters">
-          {(["all", "videos", "social", "forums", "articles"] as const).map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              className={activeFilter === filter ? "is-active" : ""}
-              onClick={() => setActiveFilter(filter)}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-
-        {savedItems.length > 0 ? (
-          <div className="ns16-saved-strip">
-            <p>Saved throwbacks ({savedItems.length})</p>
-            <div>
-              {savedItems.slice(0, 4).map((item) => (
-                <a key={item.id} href={item.url} target="_blank" rel="noreferrer">
-                  {item.title}
-                </a>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {loading ? (
-          <div className="ns16-loading-inline">
-            <div className="ns16-loading-bar-wrap">
-              <div className="ns16-loading-bar" />
-            </div>
-          </div>
-        ) : null}
-
-        {!loading && hasResults ? (
-          <ResultsList items={filteredResults} savedIds={savedIdSet} onToggleSave={toggleSave} />
-        ) : null}
-
-        {!loading && !hasResults ? (
-          <section className="ns16-empty">
-            <h2>Nostalgia Search Engine</h2>
-            <p>Type a query and press Search.</p>
-            <p>Try: youtube, school memes, old tumblr, roblox 2016</p>
-          </section>
-        ) : null}
-      </section>
-
-      <footer className="ns16-footnote">
-        <p>2016-style web search experience (live API + nostalgic ranking + interaction).</p>
-        <p className="ns16-footnote-link">
-          Set SERPSTACK_API_KEY (recommended), or TAVILY_API_KEY, SEARCH_API_KEY, YOUTUBE_API_KEY.
-        </p>
-      </footer>
+        <PlaylistSidebar />
+      </div>
     </main>
   );
 }
