@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PlaylistSidebar } from "./playlist-sidebar";
 import { ResultsList } from "./results-list";
 import { SearchBar } from "./search-bar";
 import type { InjectedResult, NostalgiaResult, RealResult, SearchApiPayload } from "./types";
 
 const LOADING_STEPS = ["Connecting to 2016 internet...", "Searching archived web...", "Indexing old pages..."] as const;
+const TRANSITION_STEPS = ["Rewinding timeline...", "Dialing year: 2016...", "Restoring old internet..."] as const;
 const QUICK_PROMPTS = [
   "youtube",
   "instagram 2016",
@@ -16,9 +17,18 @@ const QUICK_PROMPTS = [
   "best songs 2016",
   "school memes 2016",
 ] as const;
+const CHAOS_MESSAGES = [
+  "Someone tagged you in a blurry concert photo.",
+  "This Vine is trending again.",
+  "Tumblr dashboard is chaotic tonight.",
+  "2016 quiz unlocked: What pizza are you?",
+  "A friend posted 12 selfies in a row.",
+] as const;
 
+type SceneMode = "intro" | "transition" | "search";
 type SearchFilter = "all" | "videos" | "social" | "forums" | "articles";
-type ViewMode = "home" | "results";
+type NavTab = "search" | "videos" | "tumblr" | "forums" | "saved";
+type ChaosToast = { id: string; message: string };
 
 function buildInjected(query: string): InjectedResult[] {
   const focus = query.trim() || "internet";
@@ -87,26 +97,103 @@ function matchesFilter(item: NostalgiaResult, filter: SearchFilter) {
   return value.includes("buzzfeed") || value.includes("article") || value.includes("blog") || value.includes("news");
 }
 
+function getYouTubeVideoId(urlString: string) {
+  try {
+    const url = new URL(urlString);
+    if (url.hostname.includes("youtube.com")) {
+      return url.searchParams.get("v");
+    }
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.replace("/", "");
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function NostalgiaSearchApp() {
-  const [viewMode, setViewMode] = useState<ViewMode>("home");
+  const [scene, setScene] = useState<SceneMode>("intro");
+  const [memoryPrompt, setMemoryPrompt] = useState("");
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>(LOADING_STEPS[0]);
+  const [transitionMessage, setTransitionMessage] = useState<string>(TRANSITION_STEPS[0]);
   const [results, setResults] = useState<NostalgiaResult[]>([]);
   const [provider, setProvider] = useState<"serpstack" | "tavily" | "bing" | "youtube" | "fallback" | "none">("none");
   const [warning, setWarning] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<SearchFilter>("all");
+  const [activeTab, setActiveTab] = useState<NavTab>("search");
   const [savedItems, setSavedItems] = useState<RealResult[]>([]);
+  const [chaosToasts, setChaosToasts] = useState<ChaosToast[]>([]);
+  const [simulatedResult, setSimulatedResult] = useState<RealResult | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const loadingIntervalRef = useRef<number | null>(null);
+  const transitionIntervalRef = useRef<number | null>(null);
+  const transitionTimeoutRef = useRef<number | null>(null);
 
-  const filteredResults = useMemo(
-    () => results.filter((item) => matchesFilter(item, activeFilter)),
-    [activeFilter, results],
-  );
+  useEffect(() => {
+    if (scene !== "search") {
+      setChaosToasts([]);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      const toast: ChaosToast = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        message: CHAOS_MESSAGES[Math.floor(Math.random() * CHAOS_MESSAGES.length)],
+      };
+      setChaosToasts((previous) => [...previous.slice(-2), toast]);
+      window.setTimeout(() => {
+        setChaosToasts((previous) => previous.filter((entry) => entry.id !== toast.id));
+      }, 8500);
+    }, 16000);
+
+    return () => window.clearInterval(interval);
+  }, [scene]);
+
+  useEffect(() => {
+    return () => {
+      if (loadingIntervalRef.current !== null) {
+        window.clearInterval(loadingIntervalRef.current);
+      }
+      if (transitionIntervalRef.current !== null) {
+        window.clearInterval(transitionIntervalRef.current);
+      }
+      if (transitionTimeoutRef.current !== null) {
+        window.clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const currentFilter = useMemo<SearchFilter>(() => {
+    if (activeTab === "videos") {
+      return "videos";
+    }
+    if (activeTab === "tumblr") {
+      return "social";
+    }
+    if (activeTab === "forums") {
+      return "forums";
+    }
+    return activeFilter;
+  }, [activeFilter, activeTab]);
+
+  const filteredResults = useMemo(() => {
+    if (activeTab === "saved") {
+      return savedItems;
+    }
+    return results.filter((item) => matchesFilter(item, currentFilter));
+  }, [activeTab, currentFilter, results, savedItems]);
+
   const hasResults = filteredResults.length > 0;
   const savedIdSet = useMemo(() => new Set(savedItems.map((item) => item.id)), [savedItems]);
+  const trendTerms = useMemo(() => {
+    const seed = submittedQuery || memoryPrompt || "2016";
+    return [`${seed} meme dump`, `${seed} tumblr posts`, `${seed} youtube playlist`, `${seed} forum threads`];
+  }, [memoryPrompt, submittedQuery]);
 
   const providerLabel =
     provider === "serpstack"
@@ -135,8 +222,9 @@ export function NostalgiaSearchApp() {
     setLoading(true);
     setWarning("");
     setActiveFilter("all");
+    setActiveTab("search");
     setLoadingMessage(LOADING_STEPS[0]);
-    setViewMode("results");
+    setScene("search");
 
     let step = 0;
     if (loadingIntervalRef.current !== null) {
@@ -192,34 +280,118 @@ export function NostalgiaSearchApp() {
     });
   };
 
+  const dismissToast = (id: string) => {
+    setChaosToasts((previous) => previous.filter((entry) => entry.id !== id));
+  };
+
+  const beginTimeTravel = (seed?: string) => {
+    const starter = (seed ?? memoryPrompt ?? query).trim() || QUICK_PROMPTS[Math.floor(Math.random() * QUICK_PROMPTS.length)];
+    setQuery(starter);
+    setTransitionMessage(TRANSITION_STEPS[0]);
+    setScene("transition");
+
+    let step = 0;
+    if (transitionIntervalRef.current !== null) {
+      window.clearInterval(transitionIntervalRef.current);
+    }
+    transitionIntervalRef.current = window.setInterval(() => {
+      step = (step + 1) % TRANSITION_STEPS.length;
+      setTransitionMessage(TRANSITION_STEPS[step]);
+    }, reducedMotion ? 1200 : 680);
+
+    if (transitionTimeoutRef.current !== null) {
+      window.clearTimeout(transitionTimeoutRef.current);
+    }
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      if (transitionIntervalRef.current !== null) {
+        window.clearInterval(transitionIntervalRef.current);
+        transitionIntervalRef.current = null;
+      }
+      setScene("search");
+      void runSearch(starter);
+    }, reducedMotion ? 1800 : 2500);
+  };
+
+  const simulatedVideoId = simulatedResult ? getYouTubeVideoId(simulatedResult.url) : null;
+  const simulatedHost = simulatedResult ? simulatedResult.url.toLowerCase() : "";
+  const simulatedIsInstagram = simulatedHost.includes("instagram.com");
+  const simulatedIsTumblr = simulatedHost.includes("tumblr.com");
+
   return (
-    <main className="ns16-shell ns16-shell-clean">
+    <main className={`ns16-shell ns16-shell-clean ${reducedMotion ? "ns16-reduced" : ""}`}>
       <div className="ns16-noise" />
 
       <div className="ns16-app-grid">
         <section className="ns16-main-panel">
-          {viewMode === "home" ? (
-            <div className="ns16-home">
-              <div className="ns16-home-logo-wrap">
-                <Image src="/nostalgia-mark.svg" alt="Nostalgia logo" width={66} height={66} priority />
+          {scene === "intro" ? (
+            <section className="ns16-intro">
+              <div className="ns16-intro-hero">
+                <Image src="/nostalgia-mark.svg" alt="Nostalgia logo" width={76} height={76} priority />
                 <h1>NOSTALGIA</h1>
+                <p className="ns16-intro-lead">
+                  Modern feeds are optimized and overwhelming. Nostalgia recreates the messy, human internet feeling of 2016.
+                </p>
               </div>
-              <p>Search like it&apos;s 2016</p>
-              <SearchBar value={query} searching={loading} onChange={setQuery} onSubmit={() => void runSearch()} onLucky={runLucky} />
 
-              <div className="ns16-home-pills">
-                {QUICK_PROMPTS.map((prompt) => (
-                  <button key={prompt} type="button" onClick={() => void runSearch(prompt)}>
-                    {prompt}
+              <div className="ns16-intro-panel">
+                <p>What did your days feel like?</p>
+                <input
+                  value={memoryPrompt}
+                  onChange={(event) => setMemoryPrompt(event.target.value)}
+                  placeholder="after school youtube, gaming, late-night tumblr..."
+                />
+                <div className="ns16-home-pills">
+                  {QUICK_PROMPTS.map((prompt) => (
+                    <button key={prompt} type="button" onClick={() => setMemoryPrompt(prompt)}>
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+                <div className="ns16-intro-actions">
+                  <button type="button" onClick={() => beginTimeTravel(memoryPrompt)}>
+                    Begin Time Travel
                   </button>
-                ))}
+                  <button type="button" onClick={() => beginTimeTravel(QUICK_PROMPTS[Math.floor(Math.random() * QUICK_PROMPTS.length)])}>
+                    Try Random Memory
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : (
+
+              <div className="ns16-proof-strip">
+                <article>
+                  <h3>Live Search</h3>
+                  <p>Real results filtered for 2016 vibes.</p>
+                </article>
+                <article>
+                  <h3>Interactive Cards</h3>
+                  <p>Watch videos, preview posts, comment in threads.</p>
+                </article>
+                <article>
+                  <h3>Immersive Audio</h3>
+                  <p>Persistent 2016 playlist while browsing.</p>
+                </article>
+              </div>
+            </section>
+          ) : null}
+
+          {scene === "transition" ? (
+            <section className="ns16-transition">
+              <div className="ns16-transition-overlay" />
+              <div className="ns16-transition-card">
+                <p>TIME MACHINE MODE</p>
+                <h2>{transitionMessage}</h2>
+                <div className="ns16-loading-bar-wrap">
+                  <div className="ns16-loading-bar" />
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          {scene === "search" ? (
             <div className="ns16-results-view">
               <header className="ns16-toolbar">
                 <div className="ns16-brand">
-                  <button type="button" className="ns16-back-button" onClick={() => setViewMode("home")}>
+                  <button type="button" className="ns16-back-button" onClick={() => setScene("intro")}>
                     ← Back
                   </button>
                   <div className="ns16-brand-mark">
@@ -229,7 +401,13 @@ export function NostalgiaSearchApp() {
                     <h1>NOSTALGIA</h1>
                     <p>Search like it&apos;s 2016.</p>
                   </div>
+                  <div className="ns16-toolbar-controls">
+                    <button type="button" className={reducedMotion ? "is-active" : ""} onClick={() => setReducedMotion((value) => !value)}>
+                      Reduced Motion
+                    </button>
+                  </div>
                 </div>
+
                 <SearchBar
                   value={query}
                   searching={loading}
@@ -239,6 +417,17 @@ export function NostalgiaSearchApp() {
                   compact
                 />
               </header>
+
+              <section className="ns16-trending">
+                <p>Trending in 2016</p>
+                <div>
+                  {trendTerms.map((trend) => (
+                    <button key={trend} type="button" onClick={() => void runSearch(trend)}>
+                      {trend}
+                    </button>
+                  ))}
+                </div>
+              </section>
 
               <section className="ns16-results-wrap ns16-results-wrap-clean">
                 <div className="ns16-results-meta">
@@ -255,17 +444,22 @@ export function NostalgiaSearchApp() {
                   {warning && !loading ? <p className="ns16-warning">{warning}</p> : null}
                 </div>
 
-                <div className="ns16-filter-row" role="tablist" aria-label="Result filters">
-                  {(["all", "videos", "social", "forums", "articles"] as const).map((filter) => (
-                    <button
-                      key={filter}
-                      type="button"
-                      className={activeFilter === filter ? "is-active" : ""}
-                      onClick={() => setActiveFilter(filter)}
-                    >
-                      {filter}
-                    </button>
-                  ))}
+                <div className="ns16-nav-tabs">
+                  <button type="button" className={activeTab === "search" ? "is-active" : ""} onClick={() => setActiveTab("search")}>
+                    Search
+                  </button>
+                  <button type="button" className={activeTab === "videos" ? "is-active" : ""} onClick={() => setActiveTab("videos")}>
+                    Videos
+                  </button>
+                  <button type="button" className={activeTab === "tumblr" ? "is-active" : ""} onClick={() => setActiveTab("tumblr")}>
+                    Tumblr
+                  </button>
+                  <button type="button" className={activeTab === "forums" ? "is-active" : ""} onClick={() => setActiveTab("forums")}>
+                    Forums
+                  </button>
+                  <button type="button" className={activeTab === "saved" ? "is-active" : ""} onClick={() => setActiveTab("saved")}>
+                    Saved ({savedItems.length})
+                  </button>
                 </div>
 
                 {savedItems.length > 0 ? (
@@ -290,7 +484,12 @@ export function NostalgiaSearchApp() {
                 ) : null}
 
                 {!loading && hasResults ? (
-                  <ResultsList items={filteredResults} savedIds={savedIdSet} onToggleSave={toggleSave} />
+                  <ResultsList
+                    items={filteredResults}
+                    savedIds={savedIdSet}
+                    onToggleSave={toggleSave}
+                    onSimulateOpen={(item) => setSimulatedResult(item)}
+                  />
                 ) : null}
 
                 {!loading && !hasResults ? (
@@ -302,11 +501,79 @@ export function NostalgiaSearchApp() {
                 ) : null}
               </section>
             </div>
-          )}
+          ) : null}
         </section>
 
         <PlaylistSidebar />
       </div>
+
+      {chaosToasts.length > 0 ? (
+        <div className="ns16-chaos-stack">
+          {chaosToasts.map((toast) => (
+            <div key={toast.id} className="ns16-chaos">
+              <p>{toast.message}</p>
+              <button type="button" onClick={() => dismissToast(toast.id)}>
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {simulatedResult ? (
+        <div className="ns16-modal-layer" role="dialog" aria-modal="true">
+          <div className="ns16-modal-backdrop" onClick={() => setSimulatedResult(null)} />
+          <div className="ns16-modal-card">
+            <div className="ns16-modal-head">
+              <p>Simulated 2016 Tab</p>
+              <button type="button" onClick={() => setSimulatedResult(null)}>
+                Close
+              </button>
+            </div>
+
+            <h3>{simulatedResult.title}</h3>
+            <p>{simulatedResult.displayUrl}</p>
+
+            {simulatedVideoId ? (
+              <div className="ns16-modal-video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${simulatedVideoId}`}
+                  title={simulatedResult.title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            ) : null}
+
+            {simulatedIsInstagram ? (
+              <div className="ns16-modal-social">
+                <p>@nostalgia.throwback</p>
+                <p>sunset filter + grain + no algorithm drama</p>
+                <button type="button">Like</button>
+              </div>
+            ) : null}
+
+            {simulatedIsTumblr ? (
+              <div className="ns16-modal-social">
+                <p>tumblr feels //</p>
+                <p>we were cringe but free</p>
+                <button type="button">Reblog</button>
+              </div>
+            ) : null}
+
+            {!simulatedVideoId && !simulatedIsInstagram && !simulatedIsTumblr ? (
+              <div className="ns16-modal-social">
+                <p>{simulatedResult.snippet}</p>
+              </div>
+            ) : null}
+
+            <a href={simulatedResult.url} target="_blank" rel="noreferrer">
+              Open real source
+            </a>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

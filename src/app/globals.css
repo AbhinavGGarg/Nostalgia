@@ -1085,6 +1085,150 @@ body {
   min-width: 0;
 }
 
+.ns16-intro {
+  min-height: calc(100vh - 5rem);
+  display: grid;
+  align-content: center;
+  gap: 0.9rem;
+}
+
+.ns16-intro-hero {
+  border: 1px solid rgba(168, 141, 236, 0.34);
+  border-radius: 1rem;
+  background: rgba(12, 8, 24, 0.75);
+  padding: 1rem;
+  text-align: center;
+}
+
+.ns16-intro-hero h1 {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-chaos), cursive;
+  font-size: clamp(2.2rem, 7vw, 3.7rem);
+  color: #f2eaff;
+}
+
+.ns16-intro-lead {
+  margin: 0.5rem auto 0;
+  max-width: 760px;
+  font-size: 1rem;
+  color: #ddd4ff;
+  line-height: 1.5;
+}
+
+.ns16-intro-panel {
+  border: 1px solid rgba(146, 126, 205, 0.44);
+  border-radius: 0.95rem;
+  background: rgba(14, 11, 31, 0.82);
+  padding: 0.82rem;
+}
+
+.ns16-intro-panel p {
+  margin: 0;
+  color: #d7cdf8;
+  font-size: 0.88rem;
+}
+
+.ns16-intro-panel input {
+  width: 100%;
+  margin-top: 0.45rem;
+  border: 1px solid rgba(146, 128, 205, 0.58);
+  border-radius: 0.76rem;
+  background: rgba(6, 5, 15, 0.95);
+  color: #f0e9ff;
+  padding: 0.66rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+.ns16-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.48rem;
+  margin-top: 0.6rem;
+}
+
+.ns16-intro-actions button {
+  border: 1px solid rgba(160, 136, 231, 0.68);
+  border-radius: 0.68rem;
+  background: linear-gradient(100deg, rgba(93, 63, 176, 0.9), rgba(68, 127, 245, 0.78));
+  color: #f7f3ff;
+  padding: 0.52rem 0.82rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ns16-proof-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.ns16-proof-strip article {
+  border: 1px solid rgba(141, 126, 190, 0.58);
+  border-radius: 0.82rem;
+  background: rgba(16, 12, 34, 0.85);
+  padding: 0.62rem;
+}
+
+.ns16-proof-strip h3 {
+  margin: 0;
+  color: #efe8ff;
+  font-size: 0.91rem;
+}
+
+.ns16-proof-strip p {
+  margin: 0.28rem 0 0;
+  color: #c8bfeb;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.ns16-transition {
+  min-height: calc(100vh - 5rem);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.ns16-transition-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.09) 1px,
+      rgba(5, 4, 18, 0.16) 1px,
+      rgba(5, 4, 18, 0.16) 3px
+    ),
+    linear-gradient(160deg, rgba(90, 58, 184, 0.34), rgba(18, 12, 38, 0.78));
+  animation: ns16-time-shake 0.24s steps(2, end) infinite;
+}
+
+.ns16-transition-card {
+  position: relative;
+  z-index: 2;
+  width: min(640px, 94vw);
+  border: 1px solid rgba(193, 174, 255, 0.6);
+  border-radius: 1rem;
+  background: rgba(9, 6, 20, 0.9);
+  padding: 1rem;
+}
+
+.ns16-transition-card p {
+  margin: 0;
+  color: #bcaef0;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ns16-transition-card h2 {
+  margin: 0.35rem 0 0;
+  font-size: 1.6rem;
+  color: #f4eaff;
+  font-family: var(--font-chaos), cursive;
+}
+
 .ns16-home {
   min-height: calc(100vh - 5rem);
   display: grid;
@@ -1146,6 +1290,25 @@ body {
 .ns16-results-view {
   display: grid;
   gap: 0.75rem;
+}
+
+.ns16-toolbar-controls {
+  margin-left: auto;
+}
+
+.ns16-toolbar-controls button {
+  border: 1px solid rgba(136, 121, 188, 0.68);
+  border-radius: 0.5rem;
+  background: rgba(22, 16, 48, 0.72);
+  color: #e9e1ff;
+  padding: 0.3rem 0.56rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.ns16-toolbar-controls button.is-active {
+  border-color: rgba(157, 213, 255, 0.82);
+  color: #cff3ff;
 }
 
 .ns16-toolbar {
@@ -1427,6 +1590,59 @@ body {
 .ns16-warning {
   margin-top: 0.25rem;
   color: #ffcade;
+}
+
+.ns16-trending {
+  border: 1px solid rgba(148, 130, 210, 0.36);
+  border-radius: 0.88rem;
+  background: rgba(12, 10, 26, 0.86);
+  padding: 0.62rem;
+}
+
+.ns16-trending p {
+  margin: 0;
+  color: #d8ceff;
+  font-size: 0.8rem;
+}
+
+.ns16-trending div {
+  margin-top: 0.44rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ns16-trending button {
+  border: 1px solid rgba(135, 121, 186, 0.68);
+  border-radius: 999px;
+  background: rgba(42, 31, 80, 0.72);
+  color: #e3dbff;
+  padding: 0.22rem 0.58rem;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.ns16-nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.78rem;
+}
+
+.ns16-nav-tabs button {
+  border: 1px solid rgba(130, 115, 183, 0.65);
+  border-radius: 999px;
+  background: rgba(35, 25, 70, 0.5);
+  color: #d8ceff;
+  padding: 0.22rem 0.68rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.ns16-nav-tabs button.is-active {
+  border-color: rgba(164, 134, 255, 0.92);
+  background: rgba(91, 61, 179, 0.66);
+  color: #f5edff;
 }
 
 .ns16-filter-row {
@@ -1868,6 +2084,141 @@ body {
   cursor: pointer;
 }
 
+.ns16-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+}
+
+.ns16-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 5, 15, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.ns16-modal-card {
+  position: relative;
+  z-index: 2;
+  width: min(860px, 94vw);
+  border: 1px solid rgba(184, 165, 245, 0.62);
+  border-radius: 0.9rem;
+  background: rgba(12, 10, 28, 0.95);
+  padding: 0.8rem;
+}
+
+.ns16-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.ns16-modal-head p {
+  margin: 0;
+  color: #cfc3f5;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ns16-modal-head button {
+  border: 1px solid rgba(140, 127, 190, 0.68);
+  border-radius: 0.45rem;
+  background: rgba(34, 26, 67, 0.76);
+  color: #ebe2ff;
+  padding: 0.2rem 0.48rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.ns16-modal-card h3 {
+  margin: 0.45rem 0 0;
+  color: #f3ecff;
+  font-size: 1.18rem;
+}
+
+.ns16-modal-card > p {
+  margin: 0.25rem 0 0;
+  color: #9ed39e;
+  font-size: 0.82rem;
+}
+
+.ns16-modal-video {
+  margin-top: 0.6rem;
+  border: 1px solid rgba(127, 114, 180, 0.62);
+  border-radius: 0.66rem;
+  overflow: hidden;
+}
+
+.ns16-modal-video iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+.ns16-modal-social {
+  margin-top: 0.6rem;
+  border: 1px solid rgba(121, 110, 170, 0.62);
+  border-radius: 0.62rem;
+  background: rgba(16, 12, 34, 0.82);
+  padding: 0.56rem;
+}
+
+.ns16-modal-social p {
+  margin: 0;
+  color: #d0c7ef;
+  font-size: 0.84rem;
+}
+
+.ns16-modal-social p + p {
+  margin-top: 0.28rem;
+}
+
+.ns16-modal-social button {
+  margin-top: 0.42rem;
+  border: 1px solid rgba(136, 122, 190, 0.72);
+  border-radius: 0.44rem;
+  background: rgba(61, 45, 114, 0.8);
+  color: #f2ebff;
+  padding: 0.24rem 0.5rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.ns16-modal-card > a {
+  display: inline-block;
+  margin-top: 0.62rem;
+  color: #9bc1ff;
+  font-size: 0.82rem;
+}
+
+.ns16-reduced * {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
+
+@keyframes ns16-time-shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1px, 1px);
+  }
+  50% {
+    transform: translate(1px, -1px);
+  }
+  75% {
+    transform: translate(-1px, -1px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
 @keyframes ns16-progress {
   0% {
     transform: translateX(-42%);
@@ -1896,6 +2247,14 @@ body {
 
   .ns16-home .ns16-search-form {
     grid-template-columns: 1fr;
+  }
+
+  .ns16-proof-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .ns16-intro-actions {
+    flex-direction: column;
   }
 
   .ns16-search-form-compact {

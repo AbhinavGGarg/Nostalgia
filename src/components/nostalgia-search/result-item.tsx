@@ -8,9 +8,10 @@ type ResultItemProps = {
   index: number;
   isSaved: boolean;
   onToggleSave: (item: RealResult) => void;
+  onSimulateOpen: (item: RealResult) => void;
 };
 
-export function ResultItem({ item, index, isSaved, onToggleSave }: ResultItemProps) {
+export function ResultItem({ item, index, isSaved, onToggleSave, onSimulateOpen }: ResultItemProps) {
   const bump = (index % 4) - 1;
   const [openInline, setOpenInline] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
@@ -77,6 +78,9 @@ export function ResultItem({ item, index, isSaved, onToggleSave }: ResultItemPro
         </button>
         <button type="button" className={`ns16-inline-button ${isSaved ? "is-saved" : ""}`} onClick={() => onToggleSave(item)}>
           {isSaved ? "Saved" : "Save"}
+        </button>
+        <button type="button" className="ns16-inline-button" onClick={() => onSimulateOpen(item)}>
+          Simulate Tab
         </button>
       </div>
 
