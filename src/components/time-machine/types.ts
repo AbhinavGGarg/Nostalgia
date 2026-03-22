@@ -1,4 +1,14 @@
-export type FavoriteApp = "Instagram" | "Snapchat" | "Musical.ly" | "Vine" | "YouTube";
+export type FavoriteApp =
+  | "Instagram"
+  | "Snapchat"
+  | "Musical.ly"
+  | "Vine"
+  | "YouTube"
+  | "Roblox"
+  | "Fortnite"
+  | "Spotify"
+  | "Facebook"
+  | "WhatsApp";
 
 export type PersonalityVibe =
   | "funny"

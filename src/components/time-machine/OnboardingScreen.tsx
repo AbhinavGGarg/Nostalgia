@@ -7,7 +7,18 @@ type OnboardingScreenProps = {
   onComplete: (profile: UserProfile) => void;
 };
 
-const APPS: FavoriteApp[] = ["Instagram", "Snapchat", "Musical.ly", "Vine", "YouTube"];
+const APPS: FavoriteApp[] = [
+  "Instagram",
+  "Snapchat",
+  "Musical.ly",
+  "Vine",
+  "YouTube",
+  "Roblox",
+  "Fortnite",
+  "Spotify",
+  "Facebook",
+  "WhatsApp",
+];
 const VIBES: PersonalityVibe[] = [
   "funny",
   "aesthetic",

@@ -37,6 +37,11 @@ const APP_SEEDS: Record<FavoriteApp, string[]> = {
   "Musical.ly": ["lip-sync in bedroom lighting", "slow-motion transition attempt", "duet challenge"],
   Vine: ["looping six-second chaos", "quote everyone repeats", "micro-sketch with a loud cut"],
   YouTube: ["DIY fail compilation", "reaction video marathon", "storytime with clickbait title"],
+  Roblox: ["obby fail screenshot", "avatar flex post", "late-night server chaos"],
+  Fortnite: ["squad clutch clip", "storm panic moment", "victory dance spam"],
+  Spotify: ["playlist screenshot dump", "repeat song confession", "lyric quote story"],
+  Facebook: ["tagged in old album", "comment war under a meme", "family group post overload"],
+  WhatsApp: ["group chat meltdown", "voice note chain", "meme forward with 28 replies"],
 };
 
 function pick<T>(arr: T[]): T {
