@@ -37,7 +37,7 @@ function renderCard(result: NostalgiaSearchResult) {
 
 export function NostalgiaResults({ query, results, searching, searchStarted, flicker }: NostalgiaResultsProps) {
   return (
-    <section className={`retro-panel h-full min-h-[650px] p-4 sm:p-5 ${flicker ? "vhs-flicker" : ""}`}>
+    <section className={`retro-panel flex h-full min-h-[650px] flex-col p-4 sm:p-5 ${flicker ? "vhs-flicker" : ""}`}>
       <div className="mb-4 flex items-center justify-between gap-2">
         <div>
           <h2 className="font-chaos text-2xl text-white">Nostalgia Search Results</h2>
@@ -46,46 +46,48 @@ export function NostalgiaResults({ query, results, searching, searchStarted, fli
         <span className="font-pixel rounded-full bg-black/30 px-3 py-1 text-[10px] text-cyan-100">mixed 2016 web</span>
       </div>
 
-      {searching ? (
-        <div className="search2016-loading-wrap">
-          <p className="font-pixel text-sm text-cyan-100">Searching archived internet fragments...</p>
-          <p className="text-xs text-pink-100/90">Loading blurry thumbnails, old forums, and chaotic takes.</p>
-        </div>
-      ) : null}
+      <div className="search2016-results-scroll">
+        {searching ? (
+          <div className="search2016-loading-wrap">
+            <p className="font-pixel text-sm text-cyan-100">Searching archived internet fragments...</p>
+            <p className="text-xs text-pink-100/90">Loading blurry thumbnails, old forums, and chaotic takes.</p>
+          </div>
+        ) : null}
 
-      {!searching && !searchStarted ? (
-        <div className="search2016-empty-state">
-          <p className="font-chaos text-2xl text-white">Type a memory and hit Explore.</p>
-          <p className="text-sm text-cyan-100">
-            Try: music, school, youtube, summer, homework, minecraft, roblox
-          </p>
-        </div>
-      ) : null}
+        {!searching && !searchStarted ? (
+          <div className="search2016-empty-state">
+            <p className="font-chaos text-2xl text-white">Type a memory and hit Explore.</p>
+            <p className="text-sm text-cyan-100">
+              Try: music, school, youtube, summer, homework, minecraft, roblox
+            </p>
+          </div>
+        ) : null}
 
-      {!searching && searchStarted && results.length === 0 ? (
-        <div className="search2016-empty-state">
-          <p className="font-chaos text-2xl text-white">No clean results found.</p>
-          <p className="text-sm text-cyan-100">The 2016 internet was messy. Try a different word.</p>
-        </div>
-      ) : null}
+        {!searching && searchStarted && results.length === 0 ? (
+          <div className="search2016-empty-state">
+            <p className="font-chaos text-2xl text-white">No clean results found.</p>
+            <p className="text-sm text-cyan-100">The 2016 internet was messy. Try a different word.</p>
+          </div>
+        ) : null}
 
-      {!searching && results.length > 0 ? (
-        <div className="search2016-results">
-          {results.map((result, index) => (
-            <div
-              key={result.id}
-              className="search2016-result-shell"
-              style={{
-                transform: `translateY(${result.offsetY}px) rotate(${result.tilt}deg)`,
-                marginLeft: `${(index % 3) * 2}px`,
-                marginRight: `${(index % 2) * 4}px`,
-              }}
-            >
-              {renderCard(result)}
-            </div>
-          ))}
-        </div>
-      ) : null}
+        {!searching && results.length > 0 ? (
+          <div className="search2016-results">
+            {results.map((result, index) => (
+              <div
+                key={result.id}
+                className="search2016-result-shell"
+                style={{
+                  transform: `translateY(${result.offsetY}px) rotate(${result.tilt}deg)`,
+                  marginLeft: `${(index % 3) * 2}px`,
+                  marginRight: `${(index % 2) * 4}px`,
+                }}
+              >
+                {renderCard(result)}
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }

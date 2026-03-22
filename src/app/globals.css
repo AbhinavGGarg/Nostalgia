@@ -506,6 +506,13 @@ body {
   columns: 1;
 }
 
+.search2016-results-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.28rem;
+}
+
 .search2016-result-shell {
   break-inside: avoid;
   margin: 0 0 1rem;

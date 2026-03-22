@@ -43,13 +43,13 @@ export function MainFeed({ profile }: MainFeedProps) {
   };
 
   return (
-    <section className="retro-panel h-full min-h-[650px] p-4 sm:p-5">
+    <section className="retro-panel flex h-full min-h-[650px] flex-col p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-2">
         <h2 className="font-chaos text-2xl text-white">Personalized 2016 Feed</h2>
         <span className="font-pixel rounded-full bg-black/30 px-3 py-1 text-[10px] text-cyan-100">Chronological chaos</span>
       </div>
 
-      <div className="feed-scroll max-h-[70vh] space-y-4 overflow-y-auto pr-2">
+      <div className="feed-scroll flex-1 space-y-4 overflow-y-auto pr-2">
         {feed.map((item, index) => (
           <article
             key={item.id}

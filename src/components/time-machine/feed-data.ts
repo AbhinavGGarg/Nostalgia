@@ -73,7 +73,7 @@ export function createPersonalizedFeed(profile: UserProfile): FeedItem[] {
   const selectedVibes: PersonalityVibe[] = profile.vibes.length > 0 ? profile.vibes : ["aesthetic"];
   const moods = selectedVibes.flatMap((entry) => VIBE_TO_MOOD[entry]);
 
-  const baseItems: FeedItem[] = Array.from({ length: 16 }, (_, index) => {
+  const baseItems: FeedItem[] = Array.from({ length: 24 }, (_, index) => {
     const platformIndex = index % 3;
     const platform = platformIndex === 0 ? "instagram" : platformIndex === 1 ? "tumblr" : "twitter";
     const term = pick(terms);

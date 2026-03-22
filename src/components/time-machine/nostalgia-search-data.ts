@@ -193,7 +193,7 @@ export function generateNostalgiaSearchResults(profile: UserProfile, query: stri
   const seedRef = { current: hashSeed(seedSource) };
   const kinds = prioritizedKinds(query);
 
-  return Array.from({ length: 14 }, (_, index) => {
+  return Array.from({ length: 24 }, (_, index) => {
     const kind = kinds[index % kinds.length];
     const tilt = tiltFor(index, seedRef);
     const offsetY = offsetFor(index, seedRef);
