@@ -21,7 +21,7 @@ export type NostalgiaResult = RealResult | InjectedResult;
 
 export type SearchApiPayload = {
   query: string;
-  provider: "bing" | "fallback";
+  provider: "serpstack" | "tavily" | "bing" | "youtube" | "fallback";
   results: RealResult[];
   warning?: string;
 };

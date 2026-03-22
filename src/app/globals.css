@@ -1083,12 +1083,39 @@ body {
   padding: 0.8rem;
 }
 
-.ns16-toolbar h1 {
-  margin: 0 0 0.4rem;
+.ns16-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.72rem;
+  margin-bottom: 0.5rem;
+}
+
+.ns16-brand-mark {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 0.64rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.ns16-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ns16-brand h1 {
+  margin: 0;
   font-family: var(--font-chaos), cursive;
   font-size: clamp(1.55rem, 4.3vw, 2.35rem);
   color: #ece4ff;
   letter-spacing: 0.02em;
+}
+
+.ns16-brand p {
+  margin: 0.1rem 0 0;
+  color: #cfc3f8;
+  font-size: 0.82rem;
 }
 
 .ns16-glow-a,
@@ -1153,7 +1180,7 @@ body {
 }
 
 .ns16-search-form-compact {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
 }
 
 .ns16-search-input {
@@ -1191,6 +1218,33 @@ body {
 .ns16-search-button:disabled {
   opacity: 0.72;
   cursor: progress;
+}
+
+.ns16-search-button-alt {
+  background: linear-gradient(98deg, #291c4f, #3f2f72 58%, #1e153b);
+  border-color: rgba(155, 138, 198, 0.6);
+  font-size: 0.87rem;
+}
+
+.ns16-quick-prompts {
+  display: flex;
+  gap: 0.42rem;
+  flex-wrap: wrap;
+  margin-top: 0.45rem;
+}
+
+.ns16-quick-prompts button {
+  border: 1px solid rgba(136, 119, 196, 0.65);
+  border-radius: 999px;
+  background: rgba(60, 41, 111, 0.45);
+  color: #ddd4ff;
+  padding: 0.2rem 0.56rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.ns16-quick-prompts button:hover {
+  background: rgba(79, 55, 145, 0.65);
 }
 
 .ns16-loading {
@@ -1284,6 +1338,56 @@ body {
   color: #ffcade;
 }
 
+.ns16-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.78rem;
+}
+
+.ns16-filter-row button {
+  border: 1px solid rgba(130, 115, 183, 0.65);
+  border-radius: 999px;
+  background: rgba(35, 25, 70, 0.5);
+  color: #d8ceff;
+  padding: 0.22rem 0.68rem;
+  font-size: 0.76rem;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.ns16-filter-row button.is-active {
+  border-color: rgba(164, 134, 255, 0.92);
+  background: rgba(91, 61, 179, 0.66);
+  color: #f5edff;
+}
+
+.ns16-saved-strip {
+  margin: 0 0 0.8rem;
+  border: 1px solid rgba(126, 115, 176, 0.65);
+  border-radius: 0.74rem;
+  padding: 0.5rem 0.6rem;
+  background: rgba(24, 17, 47, 0.72);
+}
+
+.ns16-saved-strip p {
+  margin: 0;
+  color: #dfd8ff;
+  font-size: 0.78rem;
+}
+
+.ns16-saved-strip div {
+  margin-top: 0.34rem;
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.ns16-saved-strip a {
+  color: #a7c2ff;
+  font-size: 0.78rem;
+}
+
 .ns16-results {
   display: grid;
   gap: 0.8rem;
@@ -1320,6 +1424,140 @@ body {
   color: #b8b8c8;
   font-size: 0.9rem;
   line-height: 1.38;
+}
+
+.ns16-result-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ns16-inline-button {
+  border: 1px solid rgba(132, 117, 204, 0.72);
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.48rem;
+  background: rgba(43, 28, 84, 0.55);
+  color: #ddd6ff;
+  font-size: 0.74rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.ns16-inline-button:hover {
+  background: rgba(77, 55, 138, 0.72);
+}
+
+.ns16-inline-button.is-saved {
+  border-color: rgba(124, 201, 153, 0.8);
+  color: #c8ffd8;
+}
+
+.ns16-video-frame {
+  margin-top: 0.55rem;
+  border: 1px solid rgba(120, 110, 177, 0.6);
+  border-radius: 0.55rem;
+  overflow: hidden;
+  background: #07070b;
+  max-width: 640px;
+}
+
+.ns16-video-frame iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+.ns16-preview-box {
+  margin-top: 0.55rem;
+  border: 1px solid rgba(131, 120, 179, 0.62);
+  border-radius: 0.62rem;
+  background: rgba(18, 14, 37, 0.86);
+  padding: 0.52rem;
+}
+
+.ns16-social-preview p {
+  margin: 0;
+  color: #cbc3f4;
+  line-height: 1.35;
+  font-size: 0.84rem;
+}
+
+.ns16-social-preview p + p {
+  margin-top: 0.26rem;
+}
+
+.ns16-preview-actions {
+  margin-top: 0.4rem;
+  display: flex;
+  gap: 0.38rem;
+  flex-wrap: wrap;
+}
+
+.ns16-preview-actions button,
+.ns16-preview-actions a {
+  border: 1px solid rgba(123, 115, 174, 0.7);
+  border-radius: 0.44rem;
+  background: rgba(42, 30, 79, 0.7);
+  color: #e1d8ff;
+  text-decoration: none;
+  font-size: 0.73rem;
+  padding: 0.16rem 0.42rem;
+  cursor: pointer;
+}
+
+.ns16-thread-box {
+  margin-top: 0.55rem;
+  border: 1px dashed rgba(137, 124, 190, 0.62);
+  border-radius: 0.62rem;
+  padding: 0.52rem;
+  background: rgba(12, 9, 28, 0.86);
+}
+
+.ns16-thread-title {
+  margin: 0;
+  color: #d6ccff;
+  font-size: 0.8rem;
+}
+
+.ns16-thread-form {
+  margin-top: 0.38rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.3rem;
+}
+
+.ns16-thread-form input {
+  border: 1px solid rgba(125, 113, 177, 0.62);
+  border-radius: 0.4rem;
+  background: rgba(8, 7, 18, 0.93);
+  color: #efe8ff;
+  padding: 0.3rem 0.42rem;
+  font-size: 0.79rem;
+}
+
+.ns16-thread-form button {
+  border: 1px solid rgba(136, 122, 190, 0.72);
+  border-radius: 0.4rem;
+  background: rgba(61, 45, 114, 0.8);
+  color: #f2ebff;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.ns16-thread-list {
+  margin-top: 0.4rem;
+  display: grid;
+  gap: 0.23rem;
+}
+
+.ns16-thread-list p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #cbc3e8;
 }
 
 .ns16-injected {
@@ -1428,7 +1666,7 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .ns16-toolbar h1 {
+  .ns16-brand h1 {
     font-size: 1.92rem;
   }
 }

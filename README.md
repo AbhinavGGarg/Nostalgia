@@ -45,13 +45,16 @@ If your frontend runs on a custom origin, set:
 export NEXT_PUBLIC_APP_ORIGIN=http://localhost:3000
 ```
 
-For the Nostalgia search engine (`/`), add a Bing key:
+For the Nostalgia search engine (`/`), add either:
+
+- `SERPSTACK_API_KEY` (recommended now, broad web + easy setup)
+- `TAVILY_API_KEY` (broad web alternative)
+- `SEARCH_API_KEY` for Bing
+- `YOUTUBE_API_KEY` for YouTube fallback
 
 ```bash
 cp .env.example .env.local
 ```
-
-Then set `NEXT_PUBLIC_SEARCH_API_KEY` in `.env.local`.
 
 ## Product flow
 

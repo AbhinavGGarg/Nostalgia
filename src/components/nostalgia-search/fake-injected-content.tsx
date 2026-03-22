@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { InjectedResult } from "./types";
 
 type FakeInjectedContentProps = {
@@ -7,6 +8,8 @@ type FakeInjectedContentProps = {
 };
 
 export function FakeInjectedContent({ item }: FakeInjectedContentProps) {
+  const [open, setOpen] = useState(false);
+
   if (item.kind === "youtube") {
     return (
       <article className="ns16-result ns16-injected ns16-injected-youtube">
@@ -15,6 +18,22 @@ export function FakeInjectedContent({ item }: FakeInjectedContentProps) {
           {item.title}
         </a>
         <p className="ns16-result-snippet">{item.snippet}</p>
+        <div className="ns16-result-actions">
+          <a className="ns16-inline-button" href={item.url} target="_blank" rel="noreferrer">
+            Open YouTube
+          </a>
+          <button type="button" className="ns16-inline-button" onClick={() => setOpen((value) => !value)}>
+            {open ? "Hide Card" : "Watch Preview"}
+          </button>
+        </div>
+        {open ? (
+          <div className="ns16-preview-box">
+            <div className="ns16-social-preview">
+              <p>2016 recommended video</p>
+              <p>{item.snippet}</p>
+            </div>
+          </div>
+        ) : null}
       </article>
     );
   }
@@ -27,6 +46,11 @@ export function FakeInjectedContent({ item }: FakeInjectedContentProps) {
           {item.title}
         </a>
         <p className="ns16-result-snippet">{item.snippet}</p>
+        <div className="ns16-result-actions">
+          <a className="ns16-inline-button" href={item.url} target="_blank" rel="noreferrer">
+            Open Tumblr
+          </a>
+        </div>
       </article>
     );
   }
@@ -38,6 +62,11 @@ export function FakeInjectedContent({ item }: FakeInjectedContentProps) {
         {item.title}
       </a>
       <p className="ns16-result-snippet">{item.snippet}</p>
+      <div className="ns16-result-actions">
+        <a className="ns16-inline-button" href={item.url} target="_blank" rel="noreferrer">
+          Open Article
+        </a>
+      </div>
     </article>
   );
 }

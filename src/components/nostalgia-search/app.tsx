@@ -1,11 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { ResultsList } from "./results-list";
 import { SearchBar } from "./search-bar";
 import type { InjectedResult, NostalgiaResult, RealResult, SearchApiPayload } from "./types";
 
 const LOADING_STEPS = ["Connecting to 2016 internet...", "Searching archived web...", "Indexing old pages..."] as const;
+const QUICK_PROMPTS = [
+  "youtube gaming",
+  "snapchat stories",
+  "tumblr aesthetic quotes",
+  "roblox 2016",
+  "fortnite first trailer",
+  "best songs 2016",
+  "school memes",
+] as const;
+
+type SearchFilter = "all" | "videos" | "social" | "forums" | "articles";
 
 function buildInjected(query: string): InjectedResult[] {
   const focus = query.trim() || "internet";
@@ -14,24 +26,24 @@ function buildInjected(query: string): InjectedResult[] {
       id: `inj-video-${focus}`,
       kind: "youtube",
       title: `BEST ${focus.toUpperCase()} MOMENTS 2016`,
-      url: "https://www.youtube.com",
-      displayUrl: "youtube.com/watch?v=nostalgia2016",
+      url: "https://www.youtube.com/results?search_query=best+2016+moments",
+      displayUrl: "youtube.com/results",
       snippet: `Low-res throwback clips and chaotic comments around ${focus}.`,
     },
     {
       id: `inj-tumblr-${focus}`,
       kind: "tumblr",
       title: "tumblr mood archive",
-      url: "https://www.tumblr.com",
-      displayUrl: "tumblr.com/post/late-night-feelings",
+      url: "https://www.tumblr.com/search/2016",
+      displayUrl: "tumblr.com/search/2016",
       snippet: `i miss when ${focus} felt small, weird, and human online.`,
     },
     {
       id: `inj-buzz-${focus}`,
       kind: "buzzfeed",
       title: `21 things only 2016 ${focus} fans remember`,
-      url: "https://www.buzzfeed.com",
-      displayUrl: "buzzfeed.com/nostalgia-2016",
+      url: "https://www.buzzfeed.com/tag/nostalgia",
+      displayUrl: "buzzfeed.com/tag/nostalgia",
       snippet: "This list will absolutely unlock an old memory you forgot.",
     },
   ];
@@ -56,28 +68,71 @@ function mixResults(real: RealResult[], injected: InjectedResult[]) {
   return output;
 }
 
+function matchesFilter(item: NostalgiaResult, filter: SearchFilter) {
+  if (filter === "all") {
+    return true;
+  }
+
+  const value = `${item.title} ${item.url} ${item.displayUrl} ${item.snippet}`.toLowerCase();
+  if (filter === "videos") {
+    return value.includes("youtube") || value.includes("video") || value.includes("watch");
+  }
+  if (filter === "social") {
+    return value.includes("instagram") || value.includes("tumblr") || value.includes("snapchat") || value.includes("social");
+  }
+  if (filter === "forums") {
+    return value.includes("forum") || value.includes("reddit") || value.includes("answers") || value.includes("thread");
+  }
+  return value.includes("buzzfeed") || value.includes("article") || value.includes("blog") || value.includes("news");
+}
+
 export function NostalgiaSearchApp() {
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>(LOADING_STEPS[0]);
   const [results, setResults] = useState<NostalgiaResult[]>([]);
-  const [provider, setProvider] = useState<"bing" | "fallback" | "none">("none");
+  const [provider, setProvider] = useState<"serpstack" | "tavily" | "bing" | "youtube" | "fallback" | "none">("none");
   const [warning, setWarning] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<SearchFilter>("all");
+  const [savedItems, setSavedItems] = useState<RealResult[]>([]);
 
   const loadingIntervalRef = useRef<number | null>(null);
 
-  const hasResults = results.length > 0;
+  const filteredResults = useMemo(
+    () => results.filter((item) => matchesFilter(item, activeFilter)),
+    [activeFilter, results],
+  );
+  const hasResults = filteredResults.length > 0;
+  const savedIdSet = useMemo(() => new Set(savedItems.map((item) => item.id)), [savedItems]);
 
-  const runSearch = async () => {
-    const trimmed = query.trim();
+  const providerLabel =
+    provider === "serpstack"
+      ? "Live web results (Serpstack)"
+      : provider === "tavily"
+        ? "Live web results (Tavily)"
+        : provider === "bing"
+          ? "Live web results (Bing)"
+          : provider === "youtube"
+            ? "YouTube fallback mode"
+            : provider === "fallback"
+              ? "Fallback mode (add SERPSTACK_API_KEY)"
+              : "Ready to search 2016 web archives";
+
+  const runSearch = async (overrideQuery?: string) => {
+    const trimmed = (overrideQuery ?? query).trim();
     if (!trimmed || loading) {
       return;
+    }
+
+    if (overrideQuery) {
+      setQuery(trimmed);
     }
 
     setSubmittedQuery(trimmed);
     setLoading(true);
     setWarning("");
+    setActiveFilter("all");
     setLoadingMessage(LOADING_STEPS[0]);
 
     let step = 0;
@@ -89,7 +144,7 @@ export function NostalgiaSearchApp() {
       setLoadingMessage(LOADING_STEPS[step]);
     }, 650);
 
-    const minDelay = 1000 + Math.floor(Math.random() * 1000);
+    const minDelay = 1000 + Math.floor(Math.random() * 700);
     const startedAt = Date.now();
 
     try {
@@ -120,13 +175,44 @@ export function NostalgiaSearchApp() {
     }
   };
 
+  const runLucky = () => {
+    const luckyQuery = QUICK_PROMPTS[Math.floor(Math.random() * QUICK_PROMPTS.length)];
+    void runSearch(luckyQuery);
+  };
+
+  const toggleSave = (item: RealResult) => {
+    setSavedItems((previous) => {
+      if (previous.some((entry) => entry.id === item.id)) {
+        return previous.filter((entry) => entry.id !== item.id);
+      }
+      return [item, ...previous].slice(0, 10);
+    });
+  };
+
   return (
     <main className="ns16-shell ns16-shell-clean">
       <div className="ns16-noise" />
 
       <header className="ns16-toolbar">
-        <h1>NOSTALGIA</h1>
-        <SearchBar value={query} searching={loading} onChange={setQuery} onSubmit={runSearch} compact />
+        <div className="ns16-brand">
+          <div className="ns16-brand-mark">
+            <Image src="/nostalgia-mark.svg" alt="Nostalgia logo" width={37} height={37} priority />
+          </div>
+          <div>
+            <h1>NOSTALGIA</h1>
+            <p>Search like it&apos;s 2016.</p>
+          </div>
+        </div>
+
+        <SearchBar value={query} searching={loading} onChange={setQuery} onSubmit={() => void runSearch()} onLucky={runLucky} compact />
+
+        <div className="ns16-quick-prompts">
+          {QUICK_PROMPTS.slice(0, 5).map((prompt) => (
+            <button key={prompt} type="button" onClick={() => void runSearch(prompt)}>
+              {prompt}
+            </button>
+          ))}
+        </div>
       </header>
 
       <section className="ns16-results-wrap ns16-results-wrap-clean">
@@ -135,14 +221,40 @@ export function NostalgiaSearchApp() {
             <p className="ns16-status">{loadingMessage}</p>
           ) : hasResults ? (
             <p>
-              Showing results for &quot;{submittedQuery}&quot;
+              Showing {filteredResults.length} result(s) for &quot;{submittedQuery}&quot;
             </p>
           ) : (
             <p>Search anything to start browsing.</p>
           )}
-          {!loading ? <p>{provider === "bing" ? "Live web results" : "Fallback mode (add API key for live web)"}</p> : null}
+          {!loading ? <p>{providerLabel}</p> : null}
           {warning && !loading ? <p className="ns16-warning">{warning}</p> : null}
         </div>
+
+        <div className="ns16-filter-row" role="tablist" aria-label="Result filters">
+          {(["all", "videos", "social", "forums", "articles"] as const).map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              className={activeFilter === filter ? "is-active" : ""}
+              onClick={() => setActiveFilter(filter)}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+
+        {savedItems.length > 0 ? (
+          <div className="ns16-saved-strip">
+            <p>Saved throwbacks ({savedItems.length})</p>
+            <div>
+              {savedItems.slice(0, 4).map((item) => (
+                <a key={item.id} href={item.url} target="_blank" rel="noreferrer">
+                  {item.title}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {loading ? (
           <div className="ns16-loading-inline">
@@ -152,20 +264,24 @@ export function NostalgiaSearchApp() {
           </div>
         ) : null}
 
-        {!loading && hasResults ? <ResultsList items={results} /> : null}
+        {!loading && hasResults ? (
+          <ResultsList items={filteredResults} savedIds={savedIdSet} onToggleSave={toggleSave} />
+        ) : null}
 
         {!loading && !hasResults ? (
           <section className="ns16-empty">
             <h2>Nostalgia Search Engine</h2>
-            <p>Type a query and press Explore.</p>
+            <p>Type a query and press Search.</p>
             <p>Try: youtube, school memes, old tumblr, roblox 2016</p>
           </section>
         ) : null}
       </section>
 
       <footer className="ns16-footnote">
-        <p>2016-style web search experience (live API + nostalgic ranking).</p>
-        <p className="ns16-footnote-link">Set SEARCH_API_KEY in .env.local and Vercel for live search.</p>
+        <p>2016-style web search experience (live API + nostalgic ranking + interaction).</p>
+        <p className="ns16-footnote-link">
+          Set SERPSTACK_API_KEY (recommended), or TAVILY_API_KEY, SEARCH_API_KEY, YOUTUBE_API_KEY.
+        </p>
       </footer>
     </main>
   );
