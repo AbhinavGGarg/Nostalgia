@@ -138,7 +138,7 @@ export function TimeMachineExperience() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-3 pb-24 pt-4 sm:px-5 sm:pt-6">
+    <main className="relative min-h-screen overflow-hidden px-3 pb-24 pt-4 sm:px-5 sm:pt-6 xl:h-screen xl:pb-6">
       <div className="vhs-noise pointer-events-none absolute inset-0 opacity-45" />
       <div className="scanlines pointer-events-none absolute inset-0 opacity-35" />
       <div className="pointer-events-none absolute -left-24 top-20 h-80 w-80 rounded-full bg-pink-500/30 blur-3xl" />
@@ -172,7 +172,7 @@ export function TimeMachineExperience() {
         </div>
       </header>
 
-      <section className="relative z-10 grid gap-4 xl:grid-cols-[1.3fr_0.9fr]">
+      <section className="relative z-10 grid gap-4 xl:h-[calc(100vh-250px)] xl:grid-cols-[1.3fr_0.9fr] xl:overflow-hidden">
         {activeView === "feed" ? (
           <MainFeed profile={profile} />
         ) : (
@@ -185,7 +185,7 @@ export function TimeMachineExperience() {
           />
         )}
 
-        <div className="space-y-4 lg:ml-1">
+        <div className="space-y-4 lg:ml-1 xl:max-h-full xl:overflow-y-auto xl:pr-1">
           <MusicPlayer autoStart />
           <CameraMode />
           <MiniGames />

@@ -97,7 +97,7 @@ export function NostalgiaResults({ query, results, searching, searchStarted, fli
   };
 
   return (
-    <section className={`retro-panel flex h-full min-h-[650px] flex-col p-4 sm:p-5 ${flicker ? "vhs-flicker" : ""}`}>
+    <section className={`retro-panel flex h-full min-h-[650px] flex-col p-4 sm:p-5 xl:min-h-0 ${flicker ? "vhs-flicker" : ""}`}>
       <div className="mb-4 flex items-center justify-between gap-2">
         <div>
           <h2 className="font-chaos text-2xl text-white">Nostalgia Search Results</h2>

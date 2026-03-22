@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 export type InteractionModalItem = {
   id: string;
@@ -38,6 +39,23 @@ export function InteractionModal({ item, onClose }: InteractionModalProps) {
   const baseLikes = useMemo(() => (item ? seedScore(item.id, 80, 4200) : 0), [item]);
   const baseShares = useMemo(() => (item ? seedScore(`${item.id}-share`, 12, 700) : 0), [item]);
 
+  useEffect(() => {
+    if (!item) {
+      return;
+    }
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", onEscape);
+    return () => {
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [item, onClose]);
+
   if (!item) {
     return null;
   }
@@ -68,7 +86,11 @@ export function InteractionModal({ item, onClose }: InteractionModalProps) {
     }, 180);
   };
 
-  return (
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  return createPortal(
     <div className="interaction-overlay" role="dialog" aria-modal="true" aria-label="Post interaction modal" onClick={onClose}>
       <div className="interaction-modal" onClick={(event) => event.stopPropagation()}>
         <div className="interaction-head">
@@ -139,6 +161,7 @@ export function InteractionModal({ item, onClose }: InteractionModalProps) {
 
         {posted ? <p className="text-xs text-cyan-100">{item.postedLabel ?? "reply posted to the timeline"}</p> : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
